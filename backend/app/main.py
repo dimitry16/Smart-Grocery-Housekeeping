@@ -1,3 +1,4 @@
+from uuid import uuid4
 from app.food_data import food_items
 from fastapi import FastAPI, status
 from fastapi.exceptions import HTTPException
@@ -7,15 +8,18 @@ app = FastAPI()
 
 # Food Item Schema (for initial crud implementation)
 class FoodItemBase(BaseModel):
-    id: str
     name: str
     brand: str
     barcode: str 
     category: str 
-    image_url: str
 
 class FoodItemCreate(FoodItemBase):
     pass
+
+class FoodItemResponse(BaseModel):
+    id: str
+    image_url: str
+    
     
 # Routers
 @app.get("/")
@@ -42,3 +46,18 @@ def get_single_food_item(food_item_id: str):
             return food_item
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Food Item not found")
 
+@app.post("/food-items", response_model=FoodItemResponse, status_code=status.HTTP_201_CREATED)
+async def create_food_item(food_item: FoodItemCreate):
+    # Creates a uuid
+    new_id = uuid4()
+    new_food_item = {
+        "id": str(new_id), # Convert UUID to a string
+        "name": food_item.name,
+        "brand": food_item.brand,
+        "barcode": food_item.barcode,
+        "category": food_item.category,
+        "image_url": "https://image-of-food.com/products/",
+    }
+    
+    food_items.append(new_food_item)
+    return new_food_item
