@@ -6,4 +6,4 @@ pytest-cov==7.1.0
 ruff==0.15.10
 sqlalchemy==2.0.19
 cloud-sql-python-connector[pg8000]
-bcrypt=3.2.4
+bcrypt==3.2.4
