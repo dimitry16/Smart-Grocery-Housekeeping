@@ -8,7 +8,6 @@
 from typing import List, Optional
 from sqlalchemy import ForeignKey, Numeric
 from sqlalchemy import String
-from sqlalchemy import Integer
 import sqlalchemy
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -16,7 +15,7 @@ from sqlalchemy.orm import relationship
 from sqlconnector import Base
 import uuid
 import datetime
-import bcrypt
+
 
 class User(Base):
     __tablename__ = "user"
