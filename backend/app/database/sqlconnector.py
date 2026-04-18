@@ -12,6 +12,8 @@ import sqlalchemy
 import sqlalchemy.orm
 
 load_dotenv()
+
+
 def connect_with_connector() -> sqlalchemy.engine.base.Engine:
     """
     Initializes a connection pool for a Cloud SQL instance of Postgres.
@@ -54,6 +56,7 @@ def connect_with_connector() -> sqlalchemy.engine.base.Engine:
     )
 
     return engine, connector
+
 
 # Base class for models
 class Base(sqlalchemy.orm.DeclarativeBase):
