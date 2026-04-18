@@ -5,12 +5,13 @@
 # Source URL: https://docs.cloud.google.com/sql/docs/postgres/connect-connectors
 
 import os
+from dotenv import load_dotenv
 from google.cloud.sql.connector import Connector, IPTypes
 import pg8000
 import sqlalchemy
 import sqlalchemy.orm
 
-
+load_dotenv()
 def connect_with_connector() -> sqlalchemy.engine.base.Engine:
     """
     Initializes a connection pool for a Cloud SQL instance of Postgres.
@@ -21,10 +22,12 @@ def connect_with_connector() -> sqlalchemy.engine.base.Engine:
     # Cloud Secret Manager (https://cloud.google.com/secret-manager) to help
     # keep secrets safe.
 
-    instance_connection_name = "decoded-pivot-493200-k7:us-west1:smart-grocery-db"  # e.g. 'project:region:instance'
-    db_user = "postgres"  # e.g. 'my-db-user'
-    db_pass = "5{6$o=BdiB#6O0Fg"  # e.g. 'my-db-password'
-    db_name = "postgres"  # e.g. 'my-database'
+    instance_connection_name = os.environ[
+        "INSTANCE_CONNECTION_NAME"
+    ]  # e.g. 'project:region:instance'
+    db_user = os.environ["DB_USER"]  # e.g. 'my-db-user'
+    db_pass = os.environ["DB_PASS"]  # e.g. 'my-db-password'
+    db_name = os.environ["DB_NAME"]  # e.g. 'my-database'
 
     ip_type = IPTypes.PRIVATE if os.environ.get("PRIVATE_IP") else IPTypes.PUBLIC
 
@@ -49,17 +52,9 @@ def connect_with_connector() -> sqlalchemy.engine.base.Engine:
         creator=getconn,
         # ...
     )
-    # Creates database engine
+
     return engine, connector
 
 # Base class for models
 class Base(sqlalchemy.orm.DeclarativeBase):
     pass
-
-engine, connector = connect_with_connector()
-
-with engine.connect() as conn:
-    result = conn.execute(sqlalchemy.text("SELECT 1"))
-    print(result.fetchone())
-
-connector.close()
