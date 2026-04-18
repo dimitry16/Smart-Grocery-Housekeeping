@@ -16,7 +16,6 @@ from sqlconnector import Base
 import uuid
 import datetime
 
-
 class User(Base):
     __tablename__ = "user"
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
@@ -31,7 +30,8 @@ class User(Base):
 class UserFoodItems(Base):
     __tablename__ = "user_food_items"
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), 
+                                               nullable=False)
     food_item_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("food_items.id"), nullable=False)
 
     quantity: Mapped[Numeric] = mapped_column(sqlalchemy.Numeric(6, 2), nullable=False, default=1)
@@ -75,4 +75,4 @@ class RecipeIngredients(Base):
     unit: Mapped[Optional[str]] = mapped_column(String(30))
 
     recipe: Mapped["Recipes"] = relationship(back_populates="recipe_ingredients")
-    food_items: Mapped["FoodItem"] = relationship( )
+    food_items: Mapped["FoodItem"] = relationship()
