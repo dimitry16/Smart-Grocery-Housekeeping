@@ -5,7 +5,7 @@
 # Source URL: https://docs.sqlalchemy.org/en/20/orm/quickstart.html
 
 
-from typing import List, Optional
+from typing import List, Optional, Text
 from sqlalchemy import ForeignKey, Numeric
 from sqlalchemy import String
 import sqlalchemy
@@ -18,10 +18,10 @@ import datetime
 
 
 class User(Base):
-    __tablename__ = "user"
+    __tablename__ = "users"
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     email_address: Mapped[str] = mapped_column(nullable=False, unique=True)
-    password_hash: Mapped[str] = mapped_column(String(30), nullable=False)
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     name: Mapped[Optional[str]] = mapped_column(String(30))
 
     user_food_items: Mapped[List["UserFoodItems"]] = relationship(
@@ -33,7 +33,7 @@ class UserFoodItems(Base):
     __tablename__ = "user_food_items"
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("user.id", ondelete="CASCADE"), nullable=False
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     food_item_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("food_items.id"), nullable=False
@@ -45,18 +45,18 @@ class UserFoodItems(Base):
     unit: Mapped[Optional[str]] = mapped_column(String(30))
     expiration_date: Mapped[Optional[datetime.date]] = mapped_column(sqlalchemy.Date)
 
-    user: Mapped["User"] = relationship(back_populates="food_items")
-    food_items: Mapped["FoodItem"] = relationship()
+    user: Mapped["User"] = relationship(back_populates="user_food_items")
+    food_items: Mapped["FoodItems"] = relationship()
 
 
-class FoodItem(Base):
+class FoodItems(Base):
     __tablename__ = "food_items"
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
     brand: Mapped[Optional[str]] = mapped_column(String(30))
     barcode: Mapped[Optional[str]] = mapped_column(String(100), unique=True)
     category: Mapped[Optional[str]] = mapped_column(String(30))
-    image_url: Mapped[Optional[str]]
+    image_url: Mapped[Optional[str]] = mapped_column(Text)
 
 
 class Recipes(Base):
@@ -64,11 +64,11 @@ class Recipes(Base):
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     title: Mapped[str] = mapped_column(String(50), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(String(600))
-    image_url: Mapped[Optional[str]]
-    source_url: Mapped[Optional[str]]
+    image_url: Mapped[Optional[str]] = mapped_column(Text)
+    source_url: Mapped[Optional[str]] = mapped_column(Text)
 
     recipe_ingredients: Mapped[List["RecipeIngredients"]] = relationship(
-        back_populates="recipes", cascade="all, delete-orphan"
+        back_populates="recipe", cascade="all, delete-orphan"
     )
 
 
@@ -88,4 +88,4 @@ class RecipeIngredients(Base):
     unit: Mapped[Optional[str]] = mapped_column(String(30))
 
     recipe: Mapped["Recipes"] = relationship(back_populates="recipe_ingredients")
-    food_items: Mapped["FoodItem"] = relationship()
+    food_items: Mapped["FoodItems"] = relationship()
