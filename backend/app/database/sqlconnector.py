@@ -1,63 +1,74 @@
-# Name: Yasser Hernandez (hernayas)
-# Citation for the ode below:
-# Date: 04/15/2025
-# Adapted from "Connect using Cloud SQL Language Connectors"
-# Source URL: https://docs.cloud.google.com/sql/docs/postgres/connect-connectors
+# Name: Krystal Lu (klu04)
+# Citation for "Production - Cloud SQL" starting line 34
+# Date: 04/19/2025
+# Adapted from "Cloud SQL Python Connector"
+# Source URL: https://github.com/GoogleCloudPlatform/cloud-sql-python-connector#async-driver-usage
 
-import os
-from dotenv import load_dotenv
-from google.cloud.sql.connector import Connector, IPTypes
-import pg8000
-import sqlalchemy
-import sqlalchemy.orm
+# Name: Krystal Lu (klu04)
+# Citation for async integration
+# Date: 04/19/2025
+# Adapted from "Python FastAPI Tutorial (Part 7): Sync vs Async - Converting Your App to Asynchronous"
+# Source URL: https://www.youtube.com/watch?v=2JPDt-Jp6fM&list=PL-osiE80TeTsak-c-QsVeg0YYG_0TeyXI&index=8
 
-load_dotenv()
-
-
-def connect_with_connector() -> sqlalchemy.engine.base.Engine:
-    """
-    Initializes a connection pool for a Cloud SQL instance of Postgres.
-    Uses the Cloud SQL Python Connector package.
-    """
-    # Note: Saving credentials in environment variables is convenient, but not
-    # secure - consider a more secure solution such as
-    # Cloud Secret Manager (https://cloud.google.com/secret-manager) to help
-    # keep secrets safe.
-
-    instance_connection_name = os.environ[
-        "INSTANCE_CONNECTION_NAME"
-    ]  # e.g. 'project:region:instance'
-    db_user = os.environ["DB_USER"]  # e.g. 'my-db-user'
-    db_pass = os.environ["DB_PASS"]  # e.g. 'my-db-password'
-    db_name = os.environ["DB_NAME"]  # e.g. 'my-database'
-
-    ip_type = IPTypes.PRIVATE if os.environ.get("PRIVATE_IP") else IPTypes.PUBLIC
-
-    # initialize Cloud SQL Python Connector object
-    connector = Connector(refresh_strategy="LAZY")
-
-    def getconn() -> pg8000.dbapi.Connection:
-        conn: pg8000.dbapi.Connection = connector.connect(
-            instance_connection_name,
-            "pg8000",
-            user=db_user,
-            password=db_pass,
-            db=db_name,
-            ip_type=ip_type,
-        )
-        return conn
-
-    # The Cloud SQL Python Connector can be used with SQLAlchemy
-    # using the 'creator' argument to 'create_engine'
-    engine = sqlalchemy.create_engine(
-        "postgresql+pg8000://",
-        creator=getconn,
-        # ...
-    )
-
-    return engine, connector
+from ..config import settings
+from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession, create_async_engine
+from google.cloud.sql.connector import create_async_connector
+from sqlalchemy.orm import DeclarativeBase
 
 
 # Base class for models
-class Base(sqlalchemy.orm.DeclarativeBase):
+class Base(DeclarativeBase):
     pass
+
+
+connector = None
+engine = None
+AsyncSessionLocal = None
+
+
+async def init_db():
+    """Switch database engines depending on environment"""
+    global engine, AsyncSessionLocal, connector
+
+    # Local Development - (Local PSQL Database)
+    if settings.ENVIRONMENT == "local":
+        engine = create_async_engine(
+            str(settings.SQLALCHEMY_DATABASE_URI), echo=settings.DEBUG
+        )
+    # Production - Cloud SQL
+    else:
+        connector = await create_async_connector()
+
+        async def get_conn():
+            return await connector.connect_async(
+                settings.INSTANCE_CONNECTION_NAME,
+                "asyncpg",
+                user=settings.DB_USER,
+                password=settings.DB_PASS,
+                db=settings.DB_NAME,
+            )
+
+        engine = create_async_engine(
+            "postgresql+asyncpg://",
+            async_creator=get_conn,
+            echo=settings.DEBUG,
+        )
+
+    AsyncSessionLocal = async_sessionmaker(
+        engine, class_=AsyncSession, expire_on_commit=False
+    )
+    return engine
+
+
+# Shutdown the database engine
+async def close_db():
+    if connector:
+        await connector.close_async()
+    if engine:
+        await engine.dispose()
+
+
+# Session dependency
+async def get_db():
+    async with AsyncSessionLocal() as session:
+        yield session
