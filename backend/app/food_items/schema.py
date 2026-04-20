@@ -1,5 +1,5 @@
 import uuid
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 # Food Item Schema (for initial crud implementation)
