@@ -47,3 +47,11 @@ def create_food_item(food_item: FoodItemCreate):
 
     food_items_data.append(new_food_item)
     return new_food_item
+
+
+@router.delete("/{food_item_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_food_item(food_item_id: str):
+    """Delete food item by ID"""
+    for food_item in food_items_data:
+        if food_item.get("id") == food_item_id:
+            food_items_data.remove(food_item)
