@@ -1,3 +1,9 @@
+# Name: Krystal Lu
+# Corporation: Anthropic
+# Date: 04/16/26
+# Claude Sonnet 4.6 (Adaptive)
+# Source: https://claude.ai/share/3cc7305e-57c1-4952-8e28-4bc86e4f07f0
+
 food_items_data: list[dict] = [
     {
         "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
