@@ -1,5 +1,8 @@
-# Code Adapted from FastAPI Documentation
-# Source: https://fastapi.tiangolo.com/tutorial/sql-databases/?h=update#update-a-hero-with-heroupdate
+# Name: Krystal Lu (klu04)
+# Citation for async integration
+# Date: 04/20/2025
+# Adapted from "Python FastAPI Tutorial (Part 7): Sync vs Async - Converting Your App to Asynchronous"
+# Source URL: https://www.youtube.com/watch?v=2JPDt-Jp6fM&list=PL-osiE80TeTsak-c-QsVeg0YYG_0TeyXI&index=8
 
 from uuid import UUID
 from typing import Annotated
