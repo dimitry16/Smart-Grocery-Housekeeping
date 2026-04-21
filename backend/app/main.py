@@ -9,7 +9,7 @@ from typing import Annotated
 
 from app.database.sqlconnector import Base, close_db, get_db, init_db
 from app.food_items import router
-from fastapi import FastAPI, Depends, Request
+from fastapi import FastAPI, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 import app.database.models
 
