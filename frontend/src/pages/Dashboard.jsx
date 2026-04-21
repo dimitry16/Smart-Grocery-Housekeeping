@@ -9,7 +9,8 @@
 // URL: https://github.com/jbranchaud/til/blob/master/javascript/create-future-and-past-dates-from-today.md
 
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const mockPantryItems = [
     { id: 1, name: "Milk", brand: "Organic Valley", category: "Dairy", quantity: 1, unit: "gallon", expiration_date: "04-25-2026" },
@@ -90,8 +91,12 @@ function Dashboard() {
             <div className="p-4 border-b bg-emerald-200 flex items-center justify-between">
             <h2 className="text-2xl font-semibold text-gray-900">Current Items</h2>
             <div className="flex gap-2">
+                <Link to="/additem">
                 <Button variant="outline" size="sm">Add Item</Button>
+                </Link>
+                <Link to="/current_items">
                 <Button variant="outline" size="sm">View All</Button>
+                </Link>
             </div>
             </div>
             <PantryTable items={currentItems} />
@@ -101,7 +106,9 @@ function Dashboard() {
         <div className="rounded-lg border bg-white">
             <div className="p-4 border-b bg-mist-200 flex items-center justify-between">
             <h2 className="text-2xl font-semibold text-gray-900">Recipes</h2>
+            <Link to="/recipes">
             <Button variant="outline" size="sm">View All</Button>
+            </Link>
             </div>
             <p className="p-4 text-sm text-gray-400">Recipes coming soon.</p>
         </div>

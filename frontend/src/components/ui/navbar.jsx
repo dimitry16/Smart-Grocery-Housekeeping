@@ -14,9 +14,9 @@ import logo from '@/assets/grocery.png'
 const navItems = [
     { label: 'Dashboard', path: '/' },
     { label: 'Add Item', path: '/additem' },
-    { label: 'Scan', path: '/scan' },
-    { label: 'Barcode', path: '/barcode' },
-    { label: 'Current Items', path: '/currentitems' },
+    { label: 'Scan', path: '/item_detection' },
+    { label: 'Barcode', path: '/barcode_scanner' },
+    { label: 'Current Items', path: '/current_items' },
     { label: 'Recipes', path: '/recipes' },
     { label: 'Reports', path: '/reports' },
     { label: 'Profile', path: '/profile' },
