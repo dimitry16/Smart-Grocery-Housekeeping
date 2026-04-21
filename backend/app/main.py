@@ -9,5 +9,5 @@ app.include_router(router.router, prefix="/v1/food-items", tags=["Food Items"])
 
 # Routers
 @app.get("/")
-async def read_msg():
+def read_msg():
     return {"message": "Navigate to /food-items"}

@@ -9,7 +9,7 @@ router = APIRouter()
 
 
 @router.get("", response_model=list[FoodItemResponse])
-async def get_all_food_items():
+def get_all_food_items():
     """Read all food items."""
     return food_items_data
 
@@ -33,7 +33,7 @@ def get_single_food_item(food_item_id: str):
 
 
 @router.post("", response_model=FoodItemResponse, status_code=status.HTTP_201_CREATED)
-async def create_food_item(food_item: FoodItemCreate):
+def create_food_item(food_item: FoodItemCreate):
     # Creates a uuid
     new_id = uuid4()
     new_food_item = {
