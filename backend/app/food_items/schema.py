@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field
 class FoodItemBase(BaseModel):
     """Food Item Base properties to be shared"""
 
-    name: str = Field(..., max_length=50)
+    name: str = Field(..., min_length=4, max_length=50)
     brand: str | None = Field(None, max_length=30)
     barcode: str | None = Field(None, max_length=100)
     category: str | None = Field(None, max_length=30)
