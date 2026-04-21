@@ -2,8 +2,9 @@ from uuid import uuid4
 
 from fastapi import FastAPI, status
 from fastapi.exceptions import HTTPException
-from food_items.food_data import food_items_data
-from food_items.schema import FoodItemCreate, FoodItemResponse
+
+from app.food_items.food_data import food_items_data
+from app.food_items.schema import FoodItemCreate, FoodItemResponse
 
 app = FastAPI()
 
@@ -11,7 +12,7 @@ app = FastAPI()
 # Routers
 @app.get("/")
 async def read_msg():
-    return {"msg": "Navigate to food-items"}
+    return {"message": "Navigate to /food-items"}
 
 
 @app.get("/food-items", response_model=list[FoodItemResponse])
