@@ -19,7 +19,7 @@ router = APIRouter()
 @router.get("", response_model=list[FoodItemResponse])
 async def get_all_food_items(db: Annotated[AsyncSession, Depends(get_db)]):
     """Read all food items (in ascending order)
-    
+
     Returns:
         All existing food items.
     """
@@ -51,7 +51,7 @@ async def get_food_item(
     food_item_id: UUID, db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Get a food item by their ID.
-    
+
     Raises:
         HTTPException: 404 if food item not found.
 
@@ -76,7 +76,7 @@ async def partial_update_food_item(
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     """Partially update a food item.
-    
+
     Only the fields that are provided in the request body will be updated.
     If a barcode is provided, it must not belong to another existing food item.
 
@@ -121,12 +121,13 @@ async def partial_update_food_item(
     await db.refresh(food_item)
     return food_item
 
+
 @router.delete("/{food_item_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_food_item(
     food_item_id: UUID, db: Annotated[AsyncSession, Depends(get_db)]
 ):
     """Delete a food item by their ID.
-    
+
     Raises:
         HTTPException: 404 if food item not found.
 
@@ -137,13 +138,13 @@ async def delete_food_item(
         select(FoodItemsModel).where(FoodItemsModel.id == food_item_id),
     )
     food_item = result.scalar_one_or_none()
-    
+
     if not food_item:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Food Item not found."
         )
-    
+
     await db.delete(food_item)
     await db.commit()
-    
+
     return None
