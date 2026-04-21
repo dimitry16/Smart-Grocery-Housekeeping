@@ -8,14 +8,14 @@ from ..food_items.schema import FoodItemCreate, FoodItemResponse
 router = APIRouter()
 
 
-@router.get("", response_model=list[FoodItemResponse])
-def get_all_food_items():
+@router.get("", response_model=FoodItemResponse)
+async def get_all_food_items():
     """Read all food items."""
     return food_items_data
 
 
 @router.get("/{food_item_id}", response_model=FoodItemResponse)
-def get_single_food_item(food_item_id: str):
+async def get_single_food_item(food_item_id: str):
     """Get a specific food item by their ID
 
     Args:
@@ -33,7 +33,7 @@ def get_single_food_item(food_item_id: str):
 
 
 @router.post("", response_model=FoodItemResponse, status_code=status.HTTP_201_CREATED)
-def create_food_item(food_item: FoodItemCreate):
+async def create_food_item(food_item: FoodItemCreate):
     # Creates a uuid
     new_id = uuid4()
     new_food_item = {
@@ -50,7 +50,7 @@ def create_food_item(food_item: FoodItemCreate):
 
 
 @router.delete("/{food_item_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_food_item(food_item_id: str):
+async def delete_food_item(food_item_id: str):
     """Delete food item by ID"""
     for food_item in food_items_data:
         if food_item.get("id") == food_item_id:
