@@ -4,6 +4,8 @@ httpx==0.28.1
 pytest==9.0.3
 pytest-cov==7.1.0
 ruff==0.15.10
-sqlalchemy==2.0.19
-cloud-sql-python-connector[pg8000]
+sqlalchemy[asyncio]>=2.0.30
+asyncpg
+cloud-sql-python-connector[asyncpg]
+pydantic-settings==2.13.1
 bcrypt
