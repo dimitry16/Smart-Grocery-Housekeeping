@@ -85,6 +85,7 @@ async def delete_food_item(food_item_id: str):
     for food_item in food_items_data:
         if food_item.get("id") == food_item_id:
             food_items_data.remove(food_item)
+            return {}
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND, detail="Food item not found."
     )
