@@ -6,12 +6,6 @@ app = FastAPI()
 
 app.include_router(router.router, prefix="/v1/food-items", tags=["Food Items"])
 
-
-# Routers
-@app.get("/")
-async def read_msg():
-    return {"message": "Navigate to /food-items"}
-
 # CORS Middleware edited by Zilin Xu
 app.add_middleware(
     CORSMiddleware,
@@ -19,3 +13,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Routers
+@app.get("/")
+async def read_msg():
+    return {"message": "Navigate to /food-items"}
