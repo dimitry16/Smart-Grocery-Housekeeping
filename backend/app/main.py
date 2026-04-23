@@ -14,6 +14,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Routers
 @app.get("/")
 async def read_msg():
