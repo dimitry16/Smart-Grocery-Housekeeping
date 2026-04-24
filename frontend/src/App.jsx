@@ -1,5 +1,6 @@
 // Name: Paula Tica
 // Date: 4/19/2026
+// Edited: Zilin Xu on 4/22/2026
 // Citation:
 // Code adapted from React Router
 // URL: https://reactrouter.com/start/framework/routing
@@ -7,6 +8,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import Navbar from '@/components/ui/navbar'
+import AddItem from './pages/AddItem';
+import CurrentItems from './pages/CurrentItems';
 
 function App() {
   return (
@@ -16,10 +19,10 @@ function App() {
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/additem" element={<div className="p-6"></div>} />
+            <Route path="/additem" element={<AddItem />} />
             <Route path="/scan" element={<div className="p-6"></div>} />
             <Route path="/barcode" element={<div className="p-6"></div>} />
-            <Route path="/currentitems" element={<div className="p-6"></div>} />
+            <Route path="/current_items" element={<CurrentItems />} />
             <Route path="/recipes" element={<div className="p-6"></div>} />
             <Route path="/profile" element={<div className="p-6"></div>} />
           </Routes>
