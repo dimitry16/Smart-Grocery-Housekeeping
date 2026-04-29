@@ -1,13 +1,19 @@
 # Name: Yasser Hernandez (hernayas)
 # Citation for the ode below:
-# Date: 04/18/2025
-# Adapted from "Detect multiple objects" sample code from Google Cloud Vision API documentation.
+# Date: 04/28/2025
+# Adapted from Google Cloud Vision API documentation.
 # Source URL: https://docs.cloud.google.com/vision/docs/object-localizer
+# Source URL: https://docs.cloud.google.com/vision/docs/reference/rest/v1p2beta1/images/annotate
+# Source URL: https://docs.cloud.google.com/vision/docs/batch
 
-
+import vision_filter
 from dotenv import load_dotenv
+import os
 
+_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv()
+
+CONFIDENCE_THRESHOLD = 0.6
 
 
 def localize_objects(path):
@@ -17,8 +23,6 @@ def localize_objects(path):
     path: The path to the local file.
     """
 
-    detected_objects = []
-
     from google.cloud import vision
 
     client = vision.ImageAnnotatorClient()
@@ -27,14 +31,67 @@ def localize_objects(path):
         content = image_file.read()
     image = vision.Image(content=content)
 
-    objects = client.object_localization(image=image).localized_object_annotations
+    # Request for label detection, text detection(OCR) and web detection(searching the web for similar images)
+    objects = client.annotate_image(
+        {
+            "image": image,
+            "features": [
+                {"type_": vision.Feature.Type.LABEL_DETECTION, "max_results": 15},
+                {"type_": vision.Feature.Type.WEB_DETECTION, "max_results": 5},
+                {"type_": vision.Feature.Type.TEXT_DETECTION},
+            ],
+        }
+    )
 
-    print(f"Number of objects found: {len(objects)}")
-    for object_ in objects:
-        if object_.score >= 0.5:  # print objects with confidence >= 0.6
-            # print("Normalized bounding polygon vertices: ")
-            # for vertex in object_.bounding_poly.normalized_vertices:
-            #     print(f" - ({vertex.x}, {vertex.y})")
-            detected_objects.append(object_.name)
+    # Text detected in the image
+    if objects.text_annotations:
+        text_detected = objects.full_text_annotation.text
+    else:
+        text_detected = "No text detected" 
 
-    return detected_objects
+    # Web entities detected in the image
+    web_entities = []
+    if objects.web_detection.web_entities:
+        for entity in objects.web_detection.web_entities:
+            if entity.description and entity.score >= CONFIDENCE_THRESHOLD: 
+                web_entities.append((entity.description.lower(), entity.score))
+
+
+    # Web entities detected in the image
+    label_entities = []
+    if objects.label_annotations:
+        for entity in objects.label_annotations:
+            if entity.description and entity.score >= CONFIDENCE_THRESHOLD:
+                label_entities.append((entity.description.lower(), entity.score))
+
+
+
+    # all detected objects in the image
+    all_detected_objects = web_entities + label_entities
+    print(f"All detected objects: {all_detected_objects}")
+    
+    filtered_objects = vision_filter.filter_detected_objects(all_detected_objects)
+
+    # sorts detected objects by confidence score and returns the one with the highest score
+    if filtered_objects:
+        sorted_detected_objects = sorted(filtered_objects, key=lambda x: x[1], reverse=True)
+        top_object = sorted_detected_objects[0][0]
+
+    else:
+        top_object = "No objects detected"
+
+
+
+
+    # for object_ in objects:
+    #     if object_.score >= 0.5:  # print objects with confidence >= 0.6
+    #         # print("Normalized bounding polygon vertices: ")
+    #         # for vertex in object_.bounding_poly.normalized_vertices:
+    #         #     print(f" - ({vertex.x}, {vertex.y})")
+    #         detected_objects.append(object_.name)
+
+    return top_object
+
+print(localize_objects(os.path.join(_DIR, 'visiontest1.png')))
+print(localize_objects(os.path.join(_DIR, 'visiontest2.png')))
+print(localize_objects(os.path.join(_DIR, 'visiontest3.png')))
