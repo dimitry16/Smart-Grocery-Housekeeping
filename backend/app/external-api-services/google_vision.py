@@ -38,16 +38,9 @@ def localize_objects(path):
             "features": [
                 {"type_": vision.Feature.Type.LABEL_DETECTION, "max_results": 15},
                 {"type_": vision.Feature.Type.WEB_DETECTION, "max_results": 5},
-                {"type_": vision.Feature.Type.TEXT_DETECTION},
             ],
         }
     )
-
-    # Text detected in the image
-    if objects.text_annotations:
-        text_detected = objects.full_text_annotation.text
-    else:
-        text_detected = "No text detected" 
 
     # Web entities detected in the image
     web_entities = []
@@ -56,7 +49,6 @@ def localize_objects(path):
             if entity.description and entity.score >= CONFIDENCE_THRESHOLD: 
                 web_entities.append((entity.description.lower(), entity.score))
 
-
     # Web entities detected in the image
     label_entities = []
     if objects.label_annotations:
@@ -64,12 +56,10 @@ def localize_objects(path):
             if entity.description and entity.score >= CONFIDENCE_THRESHOLD:
                 label_entities.append((entity.description.lower(), entity.score))
 
-
-
     # all detected objects in the image
     all_detected_objects = web_entities + label_entities
-    print(f"All detected objects: {all_detected_objects}")
-    
+
+    # includes fruits and vegetables name exluding other name such fruit, food
     filtered_objects = vision_filter.filter_detected_objects(all_detected_objects)
 
     # sorts detected objects by confidence score and returns the one with the highest score
@@ -79,16 +69,6 @@ def localize_objects(path):
 
     else:
         top_object = "No objects detected"
-
-
-
-
-    # for object_ in objects:
-    #     if object_.score >= 0.5:  # print objects with confidence >= 0.6
-    #         # print("Normalized bounding polygon vertices: ")
-    #         # for vertex in object_.bounding_poly.normalized_vertices:
-    #         #     print(f" - ({vertex.x}, {vertex.y})")
-    #         detected_objects.append(object_.name)
 
     return top_object
 
