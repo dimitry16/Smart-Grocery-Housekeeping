@@ -32,6 +32,7 @@ async def init_db():
     global engine, AsyncSessionLocal, connector
 
     # Local Development (Local PostgreSQL Database)
+    # Change ENVIRONMENT to "production" in your env file to connect to cloud sql
     if settings.ENVIRONMENT == "local":
         engine = create_async_engine(settings.DATABASE_URL)
 
@@ -61,7 +62,7 @@ async def init_db():
     return engine
 
 
-async def close_db():
+async def close_db():  #
     """Shutdown database engine"""
     if connector:
         await connector.close_async()
