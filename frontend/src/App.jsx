@@ -1,5 +1,5 @@
 // Name: Paula Tica
-// Date: 4/19/2026
+// Date: 4/19/2026, updated 4/29/2026
 // Edited: Zilin Xu on 4/22/2026
 // Citation:
 // Code adapted from React Router
@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard';
 import Navbar from '@/components/ui/navbar'
 import AddItem from './pages/AddItem';
 import CurrentItems from './pages/CurrentItems';
+import Recipes from './pages/Recipes';
 
 function App() {
   return (
@@ -23,7 +24,7 @@ function App() {
             <Route path="/scan" element={<div className="p-6"></div>} />
             <Route path="/barcode" element={<div className="p-6"></div>} />
             <Route path="/current_items" element={<CurrentItems />} />
-            <Route path="/recipes" element={<div className="p-6"></div>} />
+            <Route path="/recipes" element={<Recipes/>} />
             <Route path="/profile" element={<div className="p-6"></div>} />
           </Routes>
         </main>
