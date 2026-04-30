@@ -76,7 +76,7 @@ async def partial_update_food_item(
     Raises:
         HTTPException: 404 response if food item does not exist.
     """
-    # Find requested food item by ID
+    # Get requested food item that will be updated
     result = await db.execute(
         select(FoodItemsModel).where(FoodItemsModel.id == food_item_id)
     )
@@ -87,13 +87,13 @@ async def partial_update_food_item(
         )
 
     # Only update fields that were sent in the request
-    update_food_item = food_item_data.model_dump(exclude_unset=True)
+    update_data = food_item_data.model_dump(exclude_unset=True)
 
     # If barcode is being updated, then check if barcode is unique
-    if "barcode" in update_food_item and update_food_item["barcode"] is not None:
+    if "barcode" in update_data and update_data["barcode"] is not None:
         result = await db.execute(
             select(FoodItemsModel).where(
-                FoodItemsModel.barcode == update_food_item["barcode"]
+                FoodItemsModel.barcode == update_data["barcode"]
             )
         )
         exist = result.scalar_one_or_none()
@@ -104,7 +104,7 @@ async def partial_update_food_item(
             )
 
     # Update food item
-    for key, val in update_food_item.items():
+    for key, val in update_data.items():
         setattr(food_item, key, val)
 
     await db.commit()
