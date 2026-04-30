@@ -61,10 +61,12 @@ async def create_food_item(
     return new_food_item
 
 
-@router.patch("/{food_item_id}")
+@router.patch("/{food_item_id}", response_model=FoodItemResponse)
 async def partial_update_food_item(
-    food_item_id: str, food_item_data: FoodItemUpdate
-) -> dict:
+    food_item_id: UUID,
+    food_item_data: FoodItemUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
     """Partially updates a food item by its ID.
 
     - Only include fields that you want to update in the request body.
@@ -74,27 +76,61 @@ async def partial_update_food_item(
     Raises:
         HTTPException: 404 response if food item does not exist.
     """
-    for food_item in food_items_data:
-        if food_item["id"] == food_item_id:
-            # Only update fields that were sent in request
-            food_item.update(food_item_data.model_dump(exclude_unset=True))
-            return food_item
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND, detail="Food item not found."
+    # Find requested food item by ID
+    result = await db.execute(
+        select(FoodItemsModel).where(FoodItemsModel.id == food_item_id)
     )
+    food_item = result.scalar_one_or_none()
+    if not food_item:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Food item not found."
+        )
+
+    # Only update fields that were sent in the request
+    update_food_item = food_item_data.model_dump(exclude_unset=True)
+
+    # If barcode is being updated, then check if barcode is unique
+    if "barcode" in update_food_item and update_food_item["barcode"] is not None:
+        result = await db.execute(
+            select(FoodItemsModel).where(
+                FoodItemsModel.barcode == update_food_item["barcode"]
+            )
+        )
+        exist = result.scalar_one_or_none()
+
+        if exist and exist.id != food_item_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_NOT_FOUND, detail="Barcode already exists"
+            )
+
+    # Update food item
+    for key, val in update_food_item.items():
+        setattr(food_item, key, val)
+
+    await db.commit()
+    await db.refresh(food_item)
+    return food_item
 
 
 @router.delete("/{food_item_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_food_item(food_item_id: str):
+async def delete_food_item(
+    food_item_id: UUID, db: Annotated[AsyncSession, Depends(get_db)]
+):
     """Delete food item by ID.
 
     Raises:
         HTTPException: 404 response if food item does not exist.
     """
-    for food_item in food_items_data:
-        if food_item.get("id") == food_item_id:
-            food_items_data.remove(food_item)
-            return {}
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND, detail="Food item not found."
+    result = await db.execute(
+        select(FoodItemsModel).where(FoodItemsModel.id == food_item_id),
     )
+    food_item = result.scalar_one_or_none()
+    if not food_item:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Food item not found."
+        )
+
+    await db.delete(food_item)
+    await db.commit()
+
+    return None
