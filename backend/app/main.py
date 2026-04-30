@@ -37,5 +37,5 @@ app.add_middleware(
 
 # Routers
 @app.get("/")
-async def read_msg(db: Annotated[AsyncSession, Depends(get_db)]):
+async def root(db: Annotated[AsyncSession, Depends(get_db)]):
     return {"message": "Navigate to /food-items"}
