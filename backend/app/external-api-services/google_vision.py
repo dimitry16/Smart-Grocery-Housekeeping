@@ -46,7 +46,7 @@ def localize_objects(path):
     web_entities = []
     if objects.web_detection.web_entities:
         for entity in objects.web_detection.web_entities:
-            if entity.description and entity.score >= CONFIDENCE_THRESHOLD: 
+            if entity.description and entity.score >= CONFIDENCE_THRESHOLD:
                 web_entities.append((entity.description.lower(), entity.score))
 
     # Web entities detected in the image
@@ -64,7 +64,9 @@ def localize_objects(path):
 
     # sorts detected objects by confidence score and returns the one with the highest score
     if filtered_objects:
-        sorted_detected_objects = sorted(filtered_objects, key=lambda x: x[1], reverse=True)
+        sorted_detected_objects = sorted(
+            filtered_objects, key=lambda x: x[1], reverse=True
+        )
         top_object = sorted_detected_objects[0][0]
 
     else:
@@ -72,6 +74,7 @@ def localize_objects(path):
 
     return top_object
 
-print(localize_objects(os.path.join(_DIR, 'visiontest1.png')))
-print(localize_objects(os.path.join(_DIR, 'visiontest2.png')))
-print(localize_objects(os.path.join(_DIR, 'visiontest3.png')))
+
+print(localize_objects(os.path.join(_DIR, "visiontest1.png")))
+print(localize_objects(os.path.join(_DIR, "visiontest2.png")))
+print(localize_objects(os.path.join(_DIR, "visiontest3.png")))
