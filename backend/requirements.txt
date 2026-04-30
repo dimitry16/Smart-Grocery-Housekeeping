@@ -6,4 +6,5 @@ pytest-cov==7.1.0
 ruff==0.15.10
 sqlalchemy==2.0.19
 cloud-sql-python-connector[pg8000]
-bcrypt
+bcrypt==5.0.0
+google-cloud-vision==3.13.0
