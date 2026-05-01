@@ -1,15 +1,17 @@
-# Python
 __pycache__/
 
-# Environment
-.env
+# Unit Testing
+.coverage
+.pytest_cache/
+.cache
 
-# virtualenv
+# Environments
+.env
+*.env
 .venv
-venv
+.venv/
+env/
+venv/
 
 # ruff
 .ruff_cache/
-
-# Pytest
-.pytest_cache/
