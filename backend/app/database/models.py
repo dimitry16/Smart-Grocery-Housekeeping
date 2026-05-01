@@ -4,18 +4,15 @@
 # Adapted from "ORM Quick Start"
 # Source URL: https://docs.sqlalchemy.org/en/20/orm/quickstart.html
 
-from app.database.sqlconnector import Base
-from typing import List, Optional
-from sqlalchemy import ForeignKey, Numeric, Text
-from sqlalchemy import String
-import sqlalchemy
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
-
-
-import uuid
 import datetime
+import uuid
+from typing import List, Optional
+
+import sqlalchemy
+from sqlalchemy import ForeignKey, Numeric, String, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.database.sqlconnector import Base
 
 
 class User(Base):

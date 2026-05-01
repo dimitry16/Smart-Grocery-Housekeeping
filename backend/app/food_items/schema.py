@@ -1,3 +1,5 @@
+import uuid
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -26,4 +28,4 @@ class FoodItemUpdate(BaseModel):
 class FoodItemResponse(FoodItemBase):
     model_config = ConfigDict(from_attributes=True)
 
-    id: str
+    id: uuid.UUID
