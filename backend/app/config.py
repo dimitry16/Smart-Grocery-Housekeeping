@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     # Local PostgreSQL DB
     DATABASE_URL: str
 
+    # Test PostgreSQL DB
+    TEST_DATABASE_URL: str
+
     # Production (Cloud SQL)
     INSTANCE_CONNECTION_NAME: str = ""
     DB_USER: str = ""
