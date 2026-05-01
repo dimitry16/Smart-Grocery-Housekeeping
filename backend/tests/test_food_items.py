@@ -90,8 +90,64 @@ async def test_read_food_items_success(client: AsyncClient):
                 "image_url": f"https://image-of-food.com/products/{i}/front.jpg",
             },
         )
+        assert content.status_code == 201
 
     response = await client.get("/v1/food-items")
     assert response.status_code == 200
     content = response.json()
     assert len(content) >= 5
+
+
+@pytest.mark.anyio
+async def test_update_food_item_success(client: AsyncClient):
+    create = await client.post(
+        "/v1/food-items",
+        json={
+            "name": random_string(),
+            "brand": random_string(),
+            "barcode": random_upc(),
+            "category": random_string(),
+            "image_url": "https://image-of-food.com/products/1/front.jpg",
+        },
+    )
+    food_item_id = create.json()["id"]
+    assert create.status_code == 201
+
+    data = {
+        "name": "Updated Name",
+        "brand": "Updated Brand",
+        "barcode": "098275621346",
+        "category": "Updated Category",
+        "image_url": "https://image-of-food.com/products/2/front.jpg",
+    }
+    response = await client.patch(
+        f"/v1/food-items/{food_item_id}",
+        json=data,
+    )
+
+    assert response.status_code == 200
+    content = response.json()
+    assert content["name"] == data["name"]
+    assert content["brand"] == data["brand"]
+    assert content["barcode"] == data["barcode"]
+    assert content["category"] == data["category"]
+    assert content["image_url"] == data["image_url"]
+
+
+@pytest.mark.anyio
+async def test_delete_food_item_success(client: AsyncClient):
+    create = await client.post(
+        "/v1/food-items",
+        json={
+            "name": random_string(),
+            "brand": random_string(),
+            "barcode": random_upc(),
+            "category": random_string(),
+            "image_url": "https://image-of-food.com/products/1/front.jpg",
+        },
+    )
+    food_item_id = create.json()["id"]
+    assert create.status_code == 201
+
+    delete = await client.delete(f"/v1/food-items/{food_item_id}")
+    assert delete.status_code == 204
