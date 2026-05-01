@@ -8,7 +8,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.models import FoodItems as FoodItemsModel
 from app.database.sqlconnector import get_db
 
-from ..food_items.food_data import food_items_data
 from ..food_items.schema import (
     FoodItemCreate,
     FoodItemResponse,
