@@ -133,6 +133,40 @@ async def test_update_food_item_success(client: AsyncClient):
     assert content["category"] == data["category"]
     assert content["image_url"] == data["image_url"]
 
+@pytest.mark.anyio
+async def test_partial_update_food_item_success(client: AsyncClient):
+    create = await client.post(
+        "/v1/food-items",
+        json={
+            "name": random_string(),
+            "brand": random_string(),
+            "barcode": random_upc(),
+            "category": random_string(),
+            "image_url": "https://image-of-food.com/products/1/front.jpg",
+        },
+    )
+    food_item_id = create.json()["id"]
+    original_data = create.json()
+    assert create.status_code == 201
+
+    # Only update the name
+    new_input = {
+        "name": "Partial Updated Name",
+    }
+    response = await client.patch(
+        f"/v1/food-items/{food_item_id}",
+        json=new_input,
+    )
+
+    assert response.status_code == 200
+    updated_data = response.json()
+    assert updated_data["name"] == new_input["name"]
+    assert updated_data["name"] != original_data["name"]
+    assert updated_data["brand"] == original_data["brand"]
+    assert updated_data["barcode"] == original_data["barcode"]
+    assert updated_data["category"] == original_data["category"]
+    assert updated_data["image_url"] == original_data["image_url"]
+
 
 @pytest.mark.anyio
 async def test_delete_food_item_success(client: AsyncClient):
