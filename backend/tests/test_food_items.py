@@ -133,6 +133,7 @@ async def test_update_food_item_success(client: AsyncClient):
     assert content["category"] == data["category"]
     assert content["image_url"] == data["image_url"]
 
+
 @pytest.mark.anyio
 async def test_partial_update_food_item_success(client: AsyncClient):
     create = await client.post(
