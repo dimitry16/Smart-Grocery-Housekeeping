@@ -13,6 +13,7 @@ from app.food_items import router
 # FastAPI Docs - Lifespan: https://fastapi.tiangolo.com/advanced/events/#lifespan-events
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """Handles startup and shutdown of resources at app startup and shutdown."""
 
     # Start up database engine
     await init_db()
