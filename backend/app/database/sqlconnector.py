@@ -33,44 +33,60 @@ async def init_db():
 
     # Local Development (Local PostgreSQL Database)
     # Change ENVIRONMENT to "production" in your env file to connect to cloud sql
-    if settings.ENVIRONMENT == "local":
-        engine = create_async_engine(settings.DATABASE_URL)
+    try:
+        if settings.ENVIRONMENT == "local":
+            engine = create_async_engine(settings.SQLALCHEMY_DATABASE_URI)
 
-    # Production (Cloud SQL)
-    else:
-        connector = await create_async_connector()
+        # Production (Cloud SQL)
+        else:
+            connector = await create_async_connector()
 
-        async def get_connection():
-            return await connector.connect_async(
-                settings.instance_connection_name,
-                "asyncpg",
-                user=settings.db_user,
-                password=settings.db_pass,
-                db=settings.db_name,
+            async def get_connection():
+                return await connector.connect_async(
+                    settings.instance_connection_name,
+                    "asyncpg",
+                    user=settings.db_user,
+                    password=settings.db_pass,
+                    db=settings.db_name,
+                )
+
+            engine = create_async_engine(
+                "postgresql+asyncpg://", async_creator=get_connection
             )
 
-        engine = create_async_engine(
-            "postgresql+asyncpg://", async_creator=get_connection
+        AsyncSessionLocal = async_sessionmaker(
+            engine,
+            class_=AsyncSession,
+            expire_on_commit=False,
         )
 
-    AsyncSessionLocal = async_sessionmaker(
-        engine,
-        class_=AsyncSession,
-        expire_on_commit=False,
-    )
-
-    return engine
+        return engine
+    except Exception:
+        # Close any partially created resources.
+        await close_db()
+        raise RuntimeError("Database failed to initialize. Check the config.")
 
 
-async def close_db():  #
+async def close_db():
     """Shutdown database engine"""
+
     if connector:
         await connector.close_async()
+
     if engine:
         await engine.dispose()
 
 
 async def get_db():
     """Session Dependency"""
+
+    if AsyncSessionLocal is None:
+        raise Exception("Database is not initialized")
+
     async with AsyncSessionLocal() as session:
-        yield session
+        try:
+            yield session
+        except Exception:
+            # Rollback session on exception to maintain data integrity.
+            await session.rollback()
+            raise
