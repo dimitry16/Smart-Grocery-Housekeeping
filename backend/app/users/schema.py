@@ -23,7 +23,7 @@ class UserResponse(UserBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
-    name: str
+    email: EmailStr
 
 
 class UserInventoryResponse(UserResponse):
