@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.models import FoodItems as FoodItemsModel
+from app.database.models import FoodItem as FoodItemModel
 from app.database.sqlconnector import get_db
 
 from ..food_items.schema import (
@@ -20,9 +20,7 @@ router = APIRouter()
 @router.get("", response_model=list[FoodItemResponse])
 async def get_all_food_items(db: Annotated[AsyncSession, Depends(get_db)]):
     """Read all food items."""
-    result = await db.execute(
-        select(FoodItemsModel).order_by(FoodItemsModel.name.asc())
-    )
+    result = await db.execute(select(FoodItemModel).order_by(FoodItemModel.name.asc()))
     food_items = result.scalars().all()
     return food_items
 
@@ -37,7 +35,7 @@ async def get_single_food_item(
         HTTPException: 404 response if food item does not exist.
     """
     result = await db.execute(
-        select(FoodItemsModel).where(FoodItemsModel.id == food_item_id),
+        select(FoodItemModel).where(FoodItemModel.id == food_item_id),
     )
     food_item = result.scalars().first()
     if food_item:
@@ -53,7 +51,7 @@ async def create_food_item(
 ):
     """Create a food item."""
 
-    new_food_item = FoodItemsModel(**food_item.model_dump())
+    new_food_item = FoodItemModel(**food_item.model_dump())
     db.add(new_food_item)
     await db.commit()
     await db.refresh(new_food_item)
@@ -77,7 +75,7 @@ async def partial_update_food_item(
     """
     # Get requested food item that will be updated
     result = await db.execute(
-        select(FoodItemsModel).where(FoodItemsModel.id == food_item_id)
+        select(FoodItemModel).where(FoodItemModel.id == food_item_id)
     )
     food_item = result.scalar_one_or_none()
     if not food_item:
@@ -91,9 +89,7 @@ async def partial_update_food_item(
     # If barcode is being updated, then check if barcode is unique
     if "barcode" in update_data and update_data["barcode"] is not None:
         result = await db.execute(
-            select(FoodItemsModel).where(
-                FoodItemsModel.barcode == update_data["barcode"]
-            )
+            select(FoodItemModel).where(FoodItemModel.barcode == update_data["barcode"])
         )
         exist = result.scalar_one_or_none()
 
@@ -121,7 +117,7 @@ async def delete_food_item(
         HTTPException: 404 response if food item does not exist.
     """
     result = await db.execute(
-        select(FoodItemsModel).where(FoodItemsModel.id == food_item_id),
+        select(FoodItemModel).where(FoodItemModel.id == food_item_id),
     )
     food_item = result.scalar_one_or_none()
     if not food_item:
