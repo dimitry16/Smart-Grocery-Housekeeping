@@ -138,7 +138,7 @@ function Dashboard() {
                     <Card key={recipe.id} className="relative mx-auto w-full pt-0">
                         <div className="absolute inset-0 z-30 aspect-video bg-black/10" />
                         <img
-                            src={recipe.image}
+                            src={recipe.image ?? "https://placehold.co/640x360"}
                             alt={recipe.title}
                             className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
                         />
