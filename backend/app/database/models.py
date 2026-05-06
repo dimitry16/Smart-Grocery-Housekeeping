@@ -6,6 +6,7 @@
 
 import datetime
 import uuid
+from decimal import Decimal
 from typing import List, Optional
 
 import sqlalchemy
@@ -18,16 +19,16 @@ from app.database.sqlconnector import Base
 class User(Base):
     __tablename__ = "users"
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
-    email_address: Mapped[str] = mapped_column(nullable=False, unique=True)
+    email_address: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     name: Mapped[Optional[str]] = mapped_column(String(30))
 
-    user_food_items: Mapped[List["UserFoodItems"]] = relationship(
+    user_food_items: Mapped[List["UserFoodItem"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
 
 
-class UserFoodItems(Base):
+class UserFoodItem(Base):
     __tablename__ = "user_food_items"
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     user_id: Mapped[uuid.UUID] = mapped_column(
@@ -37,7 +38,7 @@ class UserFoodItems(Base):
         ForeignKey("food_items.id"), nullable=False
     )
 
-    quantity: Mapped[Numeric] = mapped_column(
+    quantity: Mapped[Decimal] = mapped_column(
         sqlalchemy.Numeric(6, 2), nullable=False, default=1
     )
     unit: Mapped[Optional[str]] = mapped_column(String(30))
@@ -49,10 +50,10 @@ class UserFoodItems(Base):
     )
 
     user: Mapped["User"] = relationship(back_populates="user_food_items")
-    food_items: Mapped["FoodItems"] = relationship()
+    food_item: Mapped["FoodItem"] = relationship()
 
 
-class FoodItems(Base):
+class FoodItem(Base):
     __tablename__ = "food_items"
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(50), nullable=False)
@@ -62,7 +63,7 @@ class FoodItems(Base):
     image_url: Mapped[Optional[str]] = mapped_column(Text)
 
 
-class Recipes(Base):
+class Recipe(Base):
     __tablename__ = "recipes"
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     title: Mapped[str] = mapped_column(String(50), nullable=False)
@@ -70,12 +71,12 @@ class Recipes(Base):
     image_url: Mapped[Optional[str]] = mapped_column(Text)
     source_url: Mapped[Optional[str]] = mapped_column(Text)
 
-    recipe_ingredients: Mapped[List["RecipeIngredients"]] = relationship(
+    recipe_ingredients: Mapped[List["RecipeIngredient"]] = relationship(
         back_populates="recipe", cascade="all, delete-orphan"
     )
 
 
-class RecipeIngredients(Base):
+class RecipeIngredient(Base):
     __tablename__ = "recipe_ingredients"
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     recipe_id: Mapped[uuid.UUID] = mapped_column(
@@ -90,5 +91,5 @@ class RecipeIngredients(Base):
     )
     unit: Mapped[Optional[str]] = mapped_column(String(30))
 
-    recipe: Mapped["Recipes"] = relationship(back_populates="recipe_ingredients")
-    food_items: Mapped["FoodItems"] = relationship()
+    recipe: Mapped["Recipe"] = relationship(back_populates="recipe_ingredients")
+    food_item: Mapped["FoodItem"] = relationship()
