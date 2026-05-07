@@ -4,18 +4,15 @@
 # Adapted from "ORM Quick Start"
 # Source URL: https://docs.sqlalchemy.org/en/20/orm/quickstart.html
 
-from app.database.sqlconnector import Base
-from typing import List, Optional
-from sqlalchemy import ForeignKey, Numeric, Text
-from sqlalchemy import String
-import sqlalchemy
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
-
-
-import uuid
 import datetime
+import uuid
+from typing import List, Optional
+
+import sqlalchemy
+from sqlalchemy import ForeignKey, Numeric, String, Text, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.database.sqlconnector import Base
 
 
 class User(Base):
@@ -45,6 +42,11 @@ class UserFoodItems(Base):
     )
     unit: Mapped[Optional[str]] = mapped_column(String(30))
     expiration_date: Mapped[Optional[datetime.date]] = mapped_column(sqlalchemy.Date)
+
+    # Ensure uniqueness so duplicate items are not added
+    __table_args__ = (
+        UniqueConstraint("user_id", "food_item_id", name="user_food_id_uc"),
+    )
 
     user: Mapped["User"] = relationship(back_populates="user_food_items")
     food_items: Mapped["FoodItems"] = relationship()
