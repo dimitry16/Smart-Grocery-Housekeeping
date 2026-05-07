@@ -74,6 +74,7 @@ async def partial_update_food_item(
 
     Raises:
         HTTPException: 404 response if food item does not exist.
+        HTTPException: 409 response if barcode already exists.
     """
     # Get requested food item that will be updated
     result = await db.execute(
@@ -99,7 +100,7 @@ async def partial_update_food_item(
 
         if exist and exist.id != food_item_id:
             raise HTTPException(
-                status_code=status.HTTP_400_NOT_FOUND, detail="Barcode already exists"
+                status_code=status.HTTP_409_CONFLICT, detail="Barcode already exists"
             )
 
     # Update food item
