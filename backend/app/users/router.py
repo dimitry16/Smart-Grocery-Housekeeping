@@ -114,7 +114,7 @@ async def partial_update_user(
 
         if exist and exist.id != user_id:
             raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT, detail="Email already registered"
+                status_code=status.HTTP_409_CONFLICT, detail="Email already registered."
             )
 
     # Update user info
@@ -124,3 +124,27 @@ async def partial_update_user(
     await db.commit()
     await db.refresh(user)
     return user
+
+
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(user_id: UUID, db: Annotated[AsyncSession, Depends(get_db)]):
+    """Delete a user.
+
+    Args:
+        user_id (UUID): Id of user
+        db (Annotated[AsyncSession, Depends): Session
+
+    Raises:
+        HTTPException: Raises 404 if user not found.
+    """
+    result = await db.execute(select(UserModel).where(UserModel.id == user_id))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found."
+        )
+
+    await db.delete(user)
+    await db.commit()
+
+    return None
