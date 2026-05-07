@@ -70,3 +70,57 @@ async def get_user(user_id: UUID, db: Annotated[AsyncSession, Depends(get_db)]):
     if user:
         return user
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
+
+
+@router.patch("/{user_id}", response_model=UserResponse)
+async def partial_update_user(
+    user_id: UUID, user_data: UserUpdate, db: Annotated[AsyncSession, Depends(get_db)]
+):
+    """Update or partially update a user.
+
+    Args:
+        user_id (UUID): Id of user.
+        user_data (UserUpdate): original user data
+        db (Annotated[AsyncSession, Depends): session
+
+    Raises:
+        HTTPException: Raises 404 if user not found.
+        HTTPException: Raises 409 if email address is a duplicate.
+    """
+
+    # Check of user exists
+    result = await db.execute(select(UserModel).where(UserModel.id == user_id))
+    user = result.scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found."
+        )
+
+    # only update fields that were sent in the request
+    user_update_data = user_data.model_dump(exclude_unset=True)
+
+    # Check if email address already exists
+    if (
+        "email_address" in user_update_data
+        and user_update_data["email_address"] is not None
+    ):
+        result = await db.execute(
+            select(UserModel).where(
+                UserModel.email_address == user_update_data["email_address"]
+            )
+        )
+        exist = result.scalar_one_or_none()
+
+        if exist and exist.id != user_id:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT, detail="Email already registered"
+            )
+
+    # Update user info
+    for key, val in user_update_data.items():
+        setattr(user, key, val)
+
+    await db.commit()
+    await db.refresh(user)
+    return user
