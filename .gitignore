@@ -5,10 +5,7 @@ backend/venv/
 backend/app/database/.env
 backend/__pycache__/
 *.pyc
-backend/app/external-api-services/decoded-pivot-493200-k7-c60a2b853953.json
-backend/app/external-api-services/visiontest1.png
-backend/app/external-api-services/visiontest2.png   
-backend/app/external-api-services/visiontest3.png
+backend/app/external_api_services/decoded-pivot-493200-k7-c60a2b853953.json
 
 # Frontend
 frontend/node_modules/

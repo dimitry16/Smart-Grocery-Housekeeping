@@ -73,4 +73,3 @@ def localize_objects(path):
         top_object = "No objects detected"
 
     return top_object
-

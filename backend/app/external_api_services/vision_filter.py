@@ -1,4 +1,5 @@
-from . vision_filter_data import fruits, vegetables
+from .vision_filter_data import fruits, vegetables
+
 
 def filter_detected_objects(detected_objects):
     """Filter the detected objects to only include fruits and vegetables name."""
