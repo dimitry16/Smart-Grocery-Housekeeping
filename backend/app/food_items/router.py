@@ -96,7 +96,7 @@ async def partial_update_food_item(
 
         if exist and exist.id != food_item_id:
             raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT, detail="Barcode already exists"
+                status_code=status.HTTP_409_CONFLICT, detail="Barcode already exists."
             )
 
     # Update food item
