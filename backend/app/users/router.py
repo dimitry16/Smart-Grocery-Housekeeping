@@ -7,8 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.models import User as UserModel
 from app.database.sqlconnector import get_db
-from app.user_food_items.schema import UserFoodItemResponse
-from app.users.schema import UserCreate, UserInventoryResponse, UserResponse, UserUpdate
+from app.users.schema import UserCreate, UserResponse, UserUpdate
 
 router = APIRouter()
 
