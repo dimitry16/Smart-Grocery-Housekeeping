@@ -6,6 +6,7 @@ backend/app/database/.env
 backend/__pycache__/
 *.pyc
 backend/app/external_api_services/decoded-pivot-493200-k7-c60a2b853953.json
+backend/tests/test_google_vision.py
 
 # Frontend
 frontend/node_modules/
