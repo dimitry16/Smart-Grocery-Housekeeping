@@ -9,7 +9,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Utensils } from "lucide-react"
+import { Utensils, ClockAlert } from "lucide-react"
 
 
 // Placeholder data for frequently used food items
@@ -17,6 +17,13 @@ const usedItems = [
     {name: "Whole milk"},
     {name: "Chicken breast"},
     {name: "Eggs (dozen)"},
+]
+
+// Placeholder data for frequently unused food items
+const unusedItems = [
+    {name: "Dried lentils"},
+    {name: "Fish sauce"},
+    {name: "Ketchup"},
 ]
 
 // Displays a list of the items within each report
@@ -43,9 +50,18 @@ const reports = [
     {
         title: "Frequently Used",
         description: "Restocked most often in the last 60 days",
+        descriptionColor: "text-green-600",
         icon: <Utensils className="w-4 h-4" style={{ color: "#3B6D11" }} />,
         iconBg: "#EAF3DE",
         items: usedItems,
+    },
+    {
+        title: "Frequently Unused",
+        description: "Sitting in your inventory the longest",
+        descriptionColor: "text-orange-500",
+        icon: <ClockAlert className="w-4 h-4" style={{ color: "#fd4c00" }} />,
+        iconBg: "#FAEEDA",
+        items: unusedItems,
     },
 ]
 
@@ -59,7 +75,6 @@ function Reports() {
                 {reports.map((report) => (
                     <Card key={report.title} className="mx-auto w-full">
                         <CardHeader>
-                            {/* Icon and badge at the top of the card */}
                         <div className="flex items-center justify-between">
                             <div
                                 className="w-8 h-8 rounded-md flex items-center justify-center"
@@ -69,7 +84,7 @@ function Reports() {
                             </div>
                         </div>
                         <CardTitle>{report.title}</CardTitle>
-                        <p className="text-xs text-green-600">{report.description}</p>
+                        <p className={`text-s ${report.descriptionColor}`}>{report.description}</p>
                         </CardHeader>
                         <CardContent>
                             <ItemList items={report.items}/>
