@@ -4,7 +4,9 @@ httpx==0.28.1
 pytest==9.0.3
 pytest-cov==7.1.0
 ruff==0.15.10
-sqlalchemy==2.0.19
-cloud-sql-python-connector[pg8000]
-bcrypt==5.0.0
+sqlalchemy==2.0.49
+cloud-sql-python-connector[asyncpg]
+asyncpg==0.31.0
+alembic==1.18.4
+pydantic-settings==2.14.0
 google-cloud-vision==3.13.0

@@ -6,7 +6,7 @@
 # Source URL: https://docs.cloud.google.com/vision/docs/reference/rest/v1p2beta1/images/annotate
 # Source URL: https://docs.cloud.google.com/vision/docs/batch
 
-import vision_filter
+from . import vision_filter
 from dotenv import load_dotenv
 import os
 
@@ -74,7 +74,3 @@ def localize_objects(path):
 
     return top_object
 
-
-print(localize_objects(os.path.join(_DIR, "visiontest1.png")))
-print(localize_objects(os.path.join(_DIR, "visiontest2.png")))
-print(localize_objects(os.path.join(_DIR, "visiontest3.png")))
