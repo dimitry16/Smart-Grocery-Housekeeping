@@ -45,8 +45,9 @@ function Recipes() {
                 {CATEGORIES.map(category => (
                     <Button
                         key={category}
-                        variant={selectedCategory === category ? "default" : "outline"}
+                        variant="outline"
                         size="sm"
+                        className={`rounded-full ${selectedCategory === category ? "bg-blue-300 border-blue-300" : "bg-white"}`}
                         onClick={() => setSelectedCategory(category)}
                     >
                         {category}
@@ -72,7 +73,7 @@ function Recipes() {
                             </CardAction>
                             <CardTitle>{recipe.title}</CardTitle>
                         </CardHeader>
-                        <CardFooter className="bg-olive-200">
+                        <CardFooter className="bg-neutral-200">
                             <Button className="w-full">View Recipe</Button>
                         </CardFooter>
                     </Card>

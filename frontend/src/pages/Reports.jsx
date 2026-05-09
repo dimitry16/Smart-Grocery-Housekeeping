@@ -9,21 +9,28 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Utensils, ClockAlert } from "lucide-react"
+import { Utensils, ClockAlert, Trash2 } from "lucide-react"
 
 
 // Placeholder data for frequently used food items
 const usedItems = [
-    {name: "Whole milk"},
-    {name: "Chicken breast"},
-    {name: "Eggs (dozen)"},
+    {name: "Whole milk", count: 4, unit: "times"},
+    {name: "Chicken breast", count: 10, unit: "times"},
+    {name: "Eggs (dozen)", count: 5, unit: "times"},
 ]
 
 // Placeholder data for frequently unused food items
 const unusedItems = [
-    {name: "Dried lentils"},
-    {name: "Fish sauce"},
-    {name: "Ketchup"},
+    {name: "Dried lentils", count:"20", unit: "days"},
+    {name: "Fish sauce", count: 30, unit: "days"},
+    {name: "Ketchup", count: 25, unit: "days"},
+]
+
+// Placeholder data for frequently spoiled food items
+const spoiledItems = [
+    {name: "Strawberries", count: 4, unit: "times"},
+    {name: "Onion", count: 5, unit: "times"},
+    {name: "Greek yogurt", count: 4, unit: "times"},
 ]
 
 // Displays a list of the items within each report
@@ -32,13 +39,10 @@ function ItemList({items}) {
     <div className="flex flex-col gap-2">
         {items.map((item) => (
             <div key={item.name} className="flex justify-between items-center">
-                <div className="flex justify-between items-baseline">
-                    <span className="text-sm text-foreground">{item.name}</span>
-                    {/* Display the raw count and unit */}
-                    <span className="text-xs text-muted-foreground ml-2 whitespace-nowrap">
-                        {item.count} {item.unit}
-                    </span>
-                </div>
+                <span className="text-sm text-foreground">{item.name}</span>
+                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                    {item.count} {item.unit}
+                </span>
             </div>
         ))}
     </div>
@@ -49,7 +53,7 @@ function ItemList({items}) {
 const reports = [
     {
         title: "Frequently Used",
-        description: "Restocked most often in the last 60 days",
+        description: "Restocked most often in the last 90 days",
         descriptionColor: "text-green-600",
         icon: <Utensils className="w-4 h-4" style={{ color: "#3B6D11" }} />,
         iconBg: "#EAF3DE",
@@ -63,6 +67,14 @@ const reports = [
         iconBg: "#FAEEDA",
         items: unusedItems,
     },
+    {
+        title: "Frequently Spoiled",
+        description: "Most often thrown away",
+        descriptionColor: "text-red-600",
+        icon: <Trash2 className="w-4 h-4" style={{ color: "#ff0000" }} />,
+        iconBg: "#FAECE7",
+        items: spoiledItems,
+    },
 ]
 
 function Reports() {
@@ -73,6 +85,8 @@ function Reports() {
             {/* Responsive grid: 1 column on mobile, 2 on tablet, 3 on desktop */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {reports.map((report) => (
+                    // Display a card for each report
+                    // Each card includes a title, description, list of food items, and footer
                     <Card key={report.title} className="mx-auto w-full">
                         <CardHeader>
                         <div className="flex items-center justify-between">
@@ -89,7 +103,7 @@ function Reports() {
                         <CardContent>
                             <ItemList items={report.items}/>
                         </CardContent>
-                        <CardFooter className="bg-olive-200">
+                        <CardFooter className="bg-neutral-200">
                             <Button className="w-full">View Details</Button>
                         </CardFooter>
                     </Card>
