@@ -2,8 +2,6 @@ import uuid
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
-from app.user_food_items.schema import UserFoodItemResponse
-
 
 class UserBase(BaseModel):
     name: str | None = Field(min_length=2, max_length=30)
@@ -23,10 +21,5 @@ class UserResponse(UserBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
+    name: str | None
     email_address: EmailStr
-
-
-class UserInventoryResponse(UserResponse):
-    model_config = ConfigDict(from_attributes=True)
-
-    user_food_items: list[UserFoodItemResponse] = []

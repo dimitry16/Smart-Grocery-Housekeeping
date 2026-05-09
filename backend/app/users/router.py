@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.models import User as UserModel
 from app.database.sqlconnector import get_db
 from app.users.schema import UserCreate, UserResponse, UserUpdate
+from app.utils import get_user_util
 
 router = APIRouter()
 
@@ -42,6 +43,7 @@ async def create_user(user: UserCreate, db: Annotated[AsyncSession, Depends(get_
         select(UserModel).where(UserModel.email_address == user.email_address)
     )
 
+    # REMINDER NOTE: Password has not been hashed yet as authentication had not been implemented.
     new_user = UserModel(
         name=user.name, email_address=user.email_address, password_hash=user.password
     )
@@ -64,11 +66,22 @@ async def get_user(user_id: UUID, db: Annotated[AsyncSession, Depends(get_db)]):
     Raises:
         HTTPException: Raises 404 if user not found.
     """
-    result = await db.execute(select(UserModel).where(UserModel.id == user_id))
-    user = result.scalar_one_or_none()
-    if user:
-        return user
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
+    return await get_user_util(user_id, db)
+
+
+@router.get("", response_model=list[UserResponse])
+async def get_all_users(db: Annotated[AsyncSession, Depends(get_db)]):
+    """Get all users.
+
+    Args:
+        db (Annotated[AsyncSession, Depends): Session
+
+    Raises:
+        HTTPException: Raises 404 if user not found.
+    """
+    result = await db.execute(select(UserModel).order_by(UserModel.email_address.asc()))
+    users = result.scalars().all()
+    return users
 
 
 @router.patch("/{user_id}", response_model=UserResponse)
@@ -88,13 +101,7 @@ async def partial_update_user(
     """
 
     # Check of user exists
-    result = await db.execute(select(UserModel).where(UserModel.id == user_id))
-    user = result.scalar_one_or_none()
-
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found."
-        )
+    user = await get_user(user_id, db)
 
     # only update fields that were sent in the request
     user_update_data = user_data.model_dump(exclude_unset=True)
@@ -136,12 +143,7 @@ async def delete_user(user_id: UUID, db: Annotated[AsyncSession, Depends(get_db)
     Raises:
         HTTPException: Raises 404 if user not found.
     """
-    result = await db.execute(select(UserModel).where(UserModel.id == user_id))
-    user = result.scalar_one_or_none()
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found."
-        )
+    user = await get_user_util(user_id, db)
 
     await db.delete(user)
     await db.commit()
