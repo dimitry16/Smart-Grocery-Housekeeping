@@ -11,6 +11,7 @@ import Navbar from '@/components/ui/navbar'
 import AddItem from './pages/AddItem';
 import CurrentItems from './pages/CurrentItems';
 import Recipes from './pages/Recipes';
+import Reports from './pages/Reports';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
             <Route path="/barcode" element={<div className="p-6"></div>} />
             <Route path="/current_items" element={<CurrentItems />} />
             <Route path="/recipes" element={<Recipes/>} />
+            <Route path="/reports" element={<Reports/>} />
             <Route path="/profile" element={<div className="p-6"></div>} />
           </Routes>
         </main>
