@@ -9,3 +9,4 @@ cloud-sql-python-connector[asyncpg]
 asyncpg==0.31.0
 alembic==1.18.4
 pydantic-settings==2.14.0
+google-cloud-vision==3.13.0
