@@ -39,10 +39,6 @@ async def create_user(user: UserCreate, db: Annotated[AsyncSession, Depends(get_
             status_code=status.HTTP_409_CONFLICT, detail="Email already registered."
         )
 
-    result = await db.execute(
-        select(UserModel).where(UserModel.email_address == user.email_address)
-    )
-
     # REMINDER NOTE: Password has not been hashed yet as authentication had not been implemented.
     new_user = UserModel(
         name=user.name, email_address=user.email_address, password_hash=user.password
