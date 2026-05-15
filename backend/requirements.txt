@@ -10,3 +10,5 @@ asyncpg==0.31.0
 alembic==1.18.4
 pydantic-settings==2.14.0
 google-cloud-vision==3.13.0
+pyjwt==2.12.1
+pwdlib[argon2]==0.3.0
