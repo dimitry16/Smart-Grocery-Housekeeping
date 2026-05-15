@@ -2,23 +2,21 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import settings
 from app.database.models import User as UserModel
 from app.database.sqlconnector import get_db
-from app.users.schema import UserCreate, UserResponse, UserUpdate
+from app.users.schema import UserCreate, UserPrivate, UserPublic, UserUpdate
 from app.utils import get_user_util
 
 router = APIRouter()
 
 
-@router.post("", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=UserPrivate, status_code=status.HTTP_201_CREATED)
 async def create_user(user: UserCreate, db: Annotated[AsyncSession, Depends(get_db)]):
-    """Creates a user.
-
-    NOTE: Password has not been hashed yet as authentication had not been implemented.
-    This is just the basic implementation for testing.
+    """Creates a new user.
 
     Args:
         user (UserCreate): Pydantic Schema for validation check
@@ -30,7 +28,9 @@ async def create_user(user: UserCreate, db: Annotated[AsyncSession, Depends(get_
 
     # Check if email has already been registered
     result = await db.execute(
-        select(UserModel).where(UserModel.email_address == user.email_address),
+        select(UserModel).where(
+            func.lower(UserModel.email_address) == user.email_address.lower()
+        ),
     )
     existing_user = result.scalar_one_or_none()
 
@@ -39,9 +39,10 @@ async def create_user(user: UserCreate, db: Annotated[AsyncSession, Depends(get_
             status_code=status.HTTP_409_CONFLICT, detail="Email already registered."
         )
 
-    # REMINDER NOTE: Password has not been hashed yet as authentication had not been implemented.
     new_user = UserModel(
-        name=user.name, email_address=user.email_address, password_hash=user.password
+        name=user.name,
+        email_address=user.email_address.lower(),
+        password_hash=user.password,
     )
 
     db.add(new_user)
@@ -51,7 +52,7 @@ async def create_user(user: UserCreate, db: Annotated[AsyncSession, Depends(get_
     return new_user
 
 
-@router.get("/{user_id}", response_model=UserResponse)
+@router.get("/{user_id}", response_model=UserPublic)
 async def get_user(user_id: UUID, db: Annotated[AsyncSession, Depends(get_db)]):
     """Get a user by their id.
 
@@ -65,22 +66,7 @@ async def get_user(user_id: UUID, db: Annotated[AsyncSession, Depends(get_db)]):
     return await get_user_util(user_id, db)
 
 
-@router.get("", response_model=list[UserResponse])
-async def get_all_users(db: Annotated[AsyncSession, Depends(get_db)]):
-    """Get all users.
-
-    Args:
-        db (Annotated[AsyncSession, Depends): Session
-
-    Raises:
-        HTTPException: Raises 404 if user not found.
-    """
-    result = await db.execute(select(UserModel).order_by(UserModel.email_address.asc()))
-    users = result.scalars().all()
-    return users
-
-
-@router.patch("/{user_id}", response_model=UserResponse)
+@router.patch("/{user_id}", response_model=UserPrivate)
 async def partial_update_user(
     user_id: UUID, user_data: UserUpdate, db: Annotated[AsyncSession, Depends(get_db)]
 ):
@@ -105,11 +91,12 @@ async def partial_update_user(
     # Check if email address already exists
     if (
         "email_address" in user_update_data
-        and user_update_data["email_address"] is not None
+        and user_update_data["email_address"].lower() is not None
     ):
         result = await db.execute(
             select(UserModel).where(
-                UserModel.email_address == user_update_data["email_address"]
+                func.lower(UserModel.email_address)
+                == user_update_data["email_address"].lower()
             )
         )
         exist = result.scalar_one_or_none()
@@ -121,7 +108,8 @@ async def partial_update_user(
 
     # Update user info
     for key, val in user_update_data.items():
-        setattr(user, key, val)
+        # Make email_address lowercase
+        setattr(user, key, val.lower() if key == "email_address" else val)
 
     await db.commit()
     await db.refresh(user)
