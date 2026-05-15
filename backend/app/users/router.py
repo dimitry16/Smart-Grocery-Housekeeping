@@ -131,7 +131,7 @@ async def get_current_user(
     # Verify token and get user id
     try:
         user_id = verify_access_token(token)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token.",

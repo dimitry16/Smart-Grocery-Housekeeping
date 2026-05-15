@@ -96,7 +96,7 @@ def verify_access_token(token: str) -> str | None:
             algorithms=[settings.ALGORITHM],
             options={"require": ["exp", "sub"]},
         )
-    except (InvalidTokenError, ValidationError):
+    except InvalidTokenError, ValidationError:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials.",
