@@ -7,9 +7,11 @@
 from datetime import datetime, timedelta, timezone
 
 import jwt
+from fastapi import HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from pwdlib import PasswordHash
+from pydantic import ValidationError
 
 from app.config import settings
 
@@ -21,14 +23,14 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_URL}/users/toke
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verifies if the password matches the given hash and updates the hash if necessary.
 
-    Reference: https://frankie567.github.io/pwdlib/reference/pwdlib/#pwdlib.PasswordHash.verify_and_update
-
     Args:
         plain_password (str): The password to be checked.
         hashed_password (str): The hashed password to be verified.
 
     Returns:
         bool: True if the password matches the hash, False otherwise.
+
+    Reference: https://frankie567.github.io/pwdlib/reference/pwdlib/#pwdlib.PasswordHash.verify_and_update
     """
     return password_hash.verify_and_update(plain_password, hashed_password)
 
@@ -54,6 +56,9 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
 
     Returns:
         str: A JSON Web Token
+
+    References: https://pyjwt.readthedocs.io/en/stable/api.html
+                https://pyjwt.readthedocs.io/en/stable/usage.html
     """
     to_encode = data.copy()
     if expires_delta:
@@ -79,6 +84,10 @@ def verify_access_token(token: str) -> str | None:
 
     Returns:
         str | None: The subject claim if token is valid, otherwise None.
+
+    References: https://pyjwt.readthedocs.io/en/stable/api.html
+                https://pyjwt.readthedocs.io/en/stable/usage.html
+
     """
     try:
         payload = jwt.decode(
@@ -87,8 +96,11 @@ def verify_access_token(token: str) -> str | None:
             algorithms=[settings.ALGORITHM],
             options={"require": ["exp", "sub"]},
         )
-    except InvalidTokenError:
-        return None
+    except (InvalidTokenError, ValidationError):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Could not validate credentials.",
+        )
     else:
         # Returns a subject claim
         # Ref: https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-claims
