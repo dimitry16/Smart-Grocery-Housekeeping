@@ -8,6 +8,7 @@ from . import google_vision
 
 router = APIRouter()
 
+
 def create_temp_path(image_bytes):
     """Creates temporary file to store uploaded image and returns path"""
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:

@@ -22,6 +22,7 @@ from app.recipes.schema import RecipeListResponse
 
 router = APIRouter()
 
+
 def calculate_expiration(user_items):
     """calculates expiration status of food items. Retuns a list of food items that are expiring within 3 days."""
     today = date.today()
@@ -34,6 +35,7 @@ def calculate_expiration(user_items):
     # tesing hardcoded food items for recipe suggestions
     food_items = ["milk", "bread", "yogurt", "salmon", "olive oil"]
     return food_items
+
 
 @router.get("/get-recipe-suggestions", response_model=RecipeListResponse)
 async def get_recipe_suggestions(
@@ -51,4 +53,4 @@ async def get_recipe_suggestions(
     user_items = result.scalars().all()
     items_expiring_soon = calculate_expiration(user_items)
     recipes = await get_recipes_from_ingredients(items_expiring_soon)
-    return { "recipes": recipes }
+    return {"recipes": recipes}

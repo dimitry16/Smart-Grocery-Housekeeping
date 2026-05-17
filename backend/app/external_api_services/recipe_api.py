@@ -12,11 +12,15 @@ async def get_recipe_information(recipe_id: int) -> dict | None:
     }
     async with httpx.AsyncClient(timeout=10.0) as client:
         try:
-            response = await client.get(f"https://api.spoonacular.com/recipes/{recipe_id}/information", params=params)
+            response = await client.get(
+                f"https://api.spoonacular.com/recipes/{recipe_id}/information",
+                params=params,
+            )
             if response.status_code == 200:
                 return response.json()
         except Exception:
             return None
+
 
 async def get_recipes_from_ingredients(ingredients):
     """Get recipe suggestions from API based on a list of ingredients."""
@@ -48,8 +52,10 @@ async def get_recipes_from_ingredients(ingredients):
                 "description": recipe_info.get("summary", "") if recipe_info else "",
                 "image_url": item.get("image"),
                 "source_url": recipe_info.get("sourceUrl"),
-                "recipe_ingredients": [i["name"] for i in item.get("usedIngredients", [])],
+                "recipe_ingredients": [
+                    i["name"] for i in item.get("usedIngredients", [])
+                ],
             }
         )
-    
+
     return normalized_recipes
