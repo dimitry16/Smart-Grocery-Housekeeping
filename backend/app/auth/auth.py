@@ -21,18 +21,18 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_URL}/users/toke
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verifies if the password matches the given hash and updates the hash if necessary.
+    """Verifies if the password matches the given hash.
 
     Args:
         plain_password (str): The password to be checked.
         hashed_password (str): The hashed password to be verified.
 
     Returns:
-        bool: True if the password matches the hash, False otherwise.
+        bool: True if the password matches the hash, False otherwise
 
-    Reference: https://frankie567.github.io/pwdlib/reference/pwdlib/#pwdlib.PasswordHash.verify_and_update
+    Reference: https://frankie567.github.io/pwdlib/reference/pwdlib/#pwdlib.PasswordHash.verify
     """
-    return password_hash.verify_and_update(plain_password, hashed_password)
+    return password_hash.verify(plain_password, hashed_password)
 
 
 def get_password_hash(password: str) -> str:
