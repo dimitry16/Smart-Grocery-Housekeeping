@@ -17,7 +17,7 @@ from app.config import settings
 
 # NOTE: Default hasher = Argon2
 password_hash = PasswordHash.recommended()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_URL}/users/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_URL}/tokens")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
