@@ -21,7 +21,7 @@ router = APIRouter()
 
 
 @router.post("", response_model=UserPrivate, status_code=status.HTTP_201_CREATED)
-async def create_user(
+async def register_user(
     user: UserCreate,
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
@@ -97,7 +97,7 @@ async def partial_update_user(
     """
 
     # Check of user exists
-    user = await get_user(user_id, db)
+    user = await get_user_util(user_id, db)
 
     # only update fields that were sent in the request
     user_update_data = user_data.model_dump(exclude_unset=True)
