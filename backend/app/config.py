@@ -35,6 +35,9 @@ class Settings(BaseSettings):
     # Frontend
     FRONTEND_URL: str = "http://localhost:5173"
 
+    # Spoonacular Recipe API
+    SPOONACULAR_API_KEY: str = ""
+
     @computed_field
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
