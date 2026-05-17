@@ -28,6 +28,13 @@ function SignUpForm() {
         <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-4">
                 <div className="grid gap-2">
+                    <Label className="text-gray-700" htmlFor="signup-name">Name</Label>
+                    <Input
+                    id="signup-name"
+                    type="text"
+                    />
+                </div>
+                <div className="grid gap-2">
                     <Label className="text-gray-700" htmlFor="signup-email">
                         Email<span className="text-red-500">*</span>
                     </Label>
