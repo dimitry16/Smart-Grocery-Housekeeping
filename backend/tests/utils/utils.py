@@ -20,7 +20,7 @@ async def create_test_user(
     )
 
     assert response.status_code == 201, f"Failed to create user: {response.text}"
-    return response.json()["id"]
+    return response.json()
 
 
 async def login_user(
