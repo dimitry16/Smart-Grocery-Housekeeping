@@ -31,7 +31,7 @@ async def login_user(
     response = await client.post(
         "v1/users/token",
         data={
-            "email_address": email_address,
+            "username": email_address,
             "password": password,
         },
     )
