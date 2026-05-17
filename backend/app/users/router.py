@@ -11,11 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.auth import (
-    get_password_hash,
-    oauth2_scheme,
-    verify_access_token,
-)
+from app.auth.services import CurrentUser, get_password_hash
 from app.database.models import User as UserModel
 from app.database.sqlconnector import get_db
 from app.users.schema import UserCreate, UserPrivate, UserPublic, UserUpdate
@@ -25,7 +21,10 @@ router = APIRouter()
 
 
 @router.post("", response_model=UserPrivate, status_code=status.HTTP_201_CREATED)
-async def create_user(user: UserCreate, db: Annotated[AsyncSession, Depends(get_db)]):
+async def create_user(
+    user: UserCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
     """Creates a new user.
 
     Args:
@@ -63,39 +62,8 @@ async def create_user(user: UserCreate, db: Annotated[AsyncSession, Depends(get_
 
 
 @router.get("/me", response_model=UserPrivate)
-async def get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)],
-    db: Annotated[AsyncSession, Depends(get_db)],
-):
-    """Get current user information.
-
-    Args:
-        token (Annotated[str, Depends): Received JWT token.
-        db (Annotated[AsyncSession, Depends): Database session.
-
-    Raises:
-        HTTPException: 401 Unauthorized if invalid or expired token.
-        HTTPException: 401 Unauthorized if user not found.
-    """
-    # Verify token and get user id
-    try:
-        user_id = verify_access_token(token)
-    except TypeError, ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired token.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    # Look for user id in the database
-    user = await db.get(UserModel, user_id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    return user
+async def read_user_info_me(current_user: CurrentUser):
+    return current_user
 
 
 @router.get("/{user_id}", response_model=UserPublic)
