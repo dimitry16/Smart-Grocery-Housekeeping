@@ -15,11 +15,10 @@ function SignUpForm() {
     // Check if both password fields have been entered and don't match
     const passwordMismatch = confirmPassword.length > 0 && password !== confirmPassword
 
-    // If passwords don't match, show alert
+    // If passwords don't match, stop form submission
     const handleSubmit = (event) => {
         event.preventDefault()
-        if (password !== confirmPassword) {
-            alert("Passwords do not match")
+        if (passwordMismatch) {
             return
         }
     }

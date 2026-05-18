@@ -9,7 +9,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardAction, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import SignUpForm from "@/components/ui/SignUpForm"
@@ -31,7 +31,7 @@ function Login() {
                     </CardAction>
                 </CardHeader>
                 <CardContent>
-                    <form>
+                    <form id="login-form">
                         <div className="flex flex-col gap-6">
                             <div className="grid gap-2">
                                 <Label className="text-gray-700" htmlFor="email">
@@ -59,7 +59,7 @@ function Login() {
                     </form>
                 </CardContent>
                 <CardFooter className="flex-col gap-2 bg-blue-300">
-                    <Button type="submit" className="w-full">Log In</Button>
+                    <Button type="submit" form="login-form" className="w-full">Log In</Button>
                 </CardFooter>
             </Card>
             {/* Sign up dialog */}
@@ -67,6 +67,7 @@ function Login() {
                 <DialogContent className="max-w-sm bg-white">
                     <DialogHeader>
                         <DialogTitle>Create an account</DialogTitle>
+                        <DialogDescription>Please enter your information below.</DialogDescription>
                     </DialogHeader>
                     <SignUpForm/>
                 </DialogContent>
