@@ -7,7 +7,6 @@
 from typing import Annotated
 from uuid import UUID
 
-import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -98,7 +97,6 @@ async def partial_update_user(
     """
 
     # Check of user exists
-    user = await get_user_util(user_id, db)
     user = await get_user_util(user_id, db)
 
     # only update fields that were sent in the request
