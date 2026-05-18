@@ -180,21 +180,19 @@ async def partial_update_user(
     """
 
     # Check of user exists
-    user = await get_user(user_id, db)
+    user = await get_user_util(user_id, db)
 
     # only update fields that were sent in the request
     user_update_data = user_data.model_dump(exclude_unset=True)
 
     # Check if email address already exists
     # Note: email addresses are case-insensitive
-    if (
-        user_update_data.email_address is not None
-        and user_update_data.email_address.lower() != user.email_address.lower()
-    ):
+
+    email = user_update_data["email_address"]
+    if email is not None and email.lower() != user.email_address.lower():
         result = await db.execute(
             select(UserModel).where(
-                func.lower(UserModel.email_address)
-                == user_update_data.email_address.lower()
+                func.lower(UserModel.email_address) == email.lower()
             )
         )
         exist = result.scalar_one_or_none()
