@@ -7,11 +7,8 @@
 from datetime import datetime, timedelta, timezone
 
 import jwt
-from fastapi import HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jwt.exceptions import InvalidTokenError
 from pwdlib import PasswordHash
-from pydantic import ValidationError
 
 from app.config import settings
 
@@ -74,34 +71,3 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
         algorithm=settings.ALGORITHM,
     )
     return encoded_jwt
-
-
-def verify_access_token(token: str) -> str | None:
-    """Helper function to decode and verify a JWT access token.
-
-    Args:
-        token (str): Token to be verified.
-
-    Returns:
-        str | None: The subject claim if token is valid, otherwise None.
-
-    References: https://pyjwt.readthedocs.io/en/stable/api.html
-                https://pyjwt.readthedocs.io/en/stable/usage.html
-
-    """
-    try:
-        payload = jwt.decode(
-            token,
-            settings.SECRET_KEY.get_secret_value(),
-            algorithms=[settings.ALGORITHM],
-            options={"require": ["exp", "sub"]},
-        )
-    except InvalidTokenError, ValidationError:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Could not validate credentials.",
-        )
-    else:
-        # Returns a subject claim
-        # Ref: https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-claims
-        return payload.get("sub")

@@ -8,8 +8,11 @@ from datetime import timedelta
 from typing import Annotated
 from uuid import UUID
 
+import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from jwt.exceptions import InvalidTokenError
+from pydantic import ValidationError
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,10 +20,9 @@ from app.auth.auth import (
     create_access_token,
     get_password_hash,
     oauth2_scheme,
-    verify_access_token,
     verify_password,
 )
-from app.auth.schema import Token
+from app.auth.schema import Token, TokenData
 from app.config import settings
 from app.database.models import User as UserModel
 from app.database.sqlconnector import get_db
@@ -130,8 +132,14 @@ async def get_current_user(
     """
     # Verify token and get user id
     try:
-        user_id = verify_access_token(token)
-    except TypeError, ValueError:
+        payload = jwt.decode(
+            token,
+            settings.SECRET_KEY.get_secret_value(),
+            algorithms=[settings.ALGORITHM],
+            options={"require": ["exp", "sub"]},
+        )
+        user_id = TokenData(**payload)  # Validate the token payload
+    except InvalidTokenError, ValidationError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token.",
@@ -139,7 +147,7 @@ async def get_current_user(
         )
 
     # Look for user id in the database
-    user = await db.get(UserModel, user_id)
+    user = await db.get(UserModel, user_id.sub)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
