@@ -26,14 +26,15 @@ async def register_user(
     user: UserCreate,
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
-    """Creates a new user.
+    """
+    Creates a new user.
 
-    Args:
-        user (UserCreate): Pydantic Schema for validation check
-        db (Annotated[AsyncSession, Depends): Session
+    **Args**:
+    - **user (UserCreate)**: Pydantic Schema for validation check
+    - **db (Annotated[AsyncSession, Depends)**: Session
 
-    Raises:
-        HTTPException: Raises 409 on duplicate email.
+    **Raises**:
+    - **HTTPException**: Raises 409 on duplicate email.
     """
 
     # Check if email has already been registered
@@ -59,6 +60,12 @@ async def register_user(
 
 @router.get("/me", response_model=UserPrivate)
 async def read_user_info_me(current_user: CurrentUser):
+    """
+    Return information of current user.
+
+    **Args**:
+    - **current_user (CurrentUser)**: The authenticated user making the request.
+    """
     return current_user
 
 
@@ -69,21 +76,24 @@ async def partial_update_user(
     user_data: UserUpdate,
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
-    """Update or partially update a user.
+    """
+    Update or partially update a user.
 
-    Args:
-        user_id (UUID): Id of user.
-        user_data (UserUpdate): original user data
-        db (Annotated[AsyncSession, Depends): session
+    **Args**:
+    - **user_id (UUID)**: Id of user.
+    - **current_user (CurrentUser)**: The authenticated user making the request.
+    - **user_data (UserUpdate)**: original user data
+    - **db (Annotated[AsyncSession, Depends)**: session
 
-    Raises:
-        HTTPException: Raises 409 if email address is a duplicate.
-        HTTPException: Raises 404 if user not found.
+    **Raises**:
+    - **HTTPException**: 403 if user not authorized to update user.
+    - **HTTPException**: Raises 404 if user not found.
+    - **HTTPException**: Raises 409 if email address is a duplicate.
     """
     if user_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to delete this user.",
+            detail="Not authorized to update this user.",
         )
 
     user = await db.get(UserModel, user_id)
@@ -128,14 +138,17 @@ async def delete_user(
     current_user: CurrentUser,
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
-    """Delete a user.
+    """
+    Delete a user.
 
-    Args:
-        user_id (UUID): Id of user
-        db (Annotated[AsyncSession, Depends): Session
+    **Args**:
+    - **user_id (UUID)**: Id of user
+    - **current_user (CurrentUser)**: The authenticated user making the request.
+    - **db (Annotated[AsyncSession, Depends)**: Session
 
-    Raises:
-        HTTPException: Raises 404 if user not found.
+    **Raises**:
+    - **HTTPException**: 403 if user not authorized to delete user.
+    - **HTTPException**: 404 if user not found.
     """
 
     if user_id != current_user.id:

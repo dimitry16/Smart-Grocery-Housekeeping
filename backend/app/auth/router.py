@@ -25,17 +25,18 @@ async def login_for_access_token(
 ) -> Token:
     """Authenticate a user and return an access token.
 
-    NOTE: "OAuth2PasswordRequestForm uses "username" field, but we will
-    use an email instead.
+    **NOTE**: OAuth2PasswordRequestForm uses the **username** field, but we will
+    use an **email** instead.
 
-    Args:
-        form_data (Annotated[OAuth2PasswordRequestForm, Depends): Login form data.
-        db (Annotated[AsyncSession, Depends): Database session.
-    Raises:
-        HTTPException: 401 if email or password is incorrect.
+    **Args**:
+    - **form_data (Annotated[OAuth2PasswordRequestForm, Depends)**: Login form data.
+    - **db (Annotated[AsyncSession, Depends)**: Database session.
 
-    Returns:
-        Token: Access token and token type.
+    **Raises**:
+    - **HTTPException**: 401 if email or password is incorrect.
+
+    **Returns**:
+    - **Token**: Access token and token type.
     """
 
     # Find user by email
