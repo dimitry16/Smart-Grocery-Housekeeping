@@ -15,7 +15,7 @@ from pwdlib import PasswordHash
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.schema import TokenData
+from app.auth.schema import TokenPayload
 from app.config import settings
 from app.database.models import User as UserModel
 from app.database.sqlconnector import get_db
@@ -103,7 +103,7 @@ async def get_current_user(
             algorithms=[settings.ALGORITHM],
             options={"require": ["exp", "sub"]},
         )
-        user_id = TokenData(**payload)  # Validate the token payload
+        user_id = TokenPayload(**payload)  # Validate the token payload
     except InvalidTokenError, ValidationError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

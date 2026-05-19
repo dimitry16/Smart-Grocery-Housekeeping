@@ -8,6 +8,6 @@ class Token(BaseModel):
     token_type: str
 
 
-class TokenData(BaseModel):
+class TokenPayload(BaseModel):
     sub: UUID
     exp: int
