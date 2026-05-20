@@ -23,7 +23,7 @@ router = APIRouter()
 
 @router.post("", response_model=UserPrivate, status_code=status.HTTP_201_CREATED)
 async def register_user(
-    user: UserCreate,
+    user_create: UserCreate,
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     """
@@ -38,7 +38,7 @@ async def register_user(
     """
 
     # Check if email has already been registered
-    user = services.get_user(user.email_address, session=db)
+    user = await services.get_user_by_email(email=user_create.email_address, db=db)
 
     if user:
         raise HTTPException(
@@ -46,9 +46,9 @@ async def register_user(
         )
 
     new_user = UserModel(
-        name=user.name,
-        email_address=user.email_address.lower(),
-        password_hash=get_password_hash(user.password),
+        name=user_create.name,
+        email_address=user_create.email_address.lower(),
+        password_hash=get_password_hash(user_create.password),
     )
 
     db.add(new_user)
