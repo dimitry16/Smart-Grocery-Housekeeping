@@ -1,5 +1,5 @@
 // Name: Paula Tica
-// Date: 4/19/2026, updated 4/29/2026
+// Date: 4/19/2026, updated 4/29/2026, updated 5/12/2026
 // Edited: Zilin Xu on 4/22/2026
 // Citation:
 // Code adapted from React Router
@@ -12,6 +12,7 @@ import AddItem from './pages/AddItem';
 import CurrentItems from './pages/CurrentItems';
 import Recipes from './pages/Recipes';
 import Reports from './pages/Reports';
+import Login from './pages/Login';
 
 function App() {
   return (
@@ -27,7 +28,7 @@ function App() {
             <Route path="/current_items" element={<CurrentItems />} />
             <Route path="/recipes" element={<Recipes/>} />
             <Route path="/reports" element={<Reports/>} />
-            <Route path="/profile" element={<div className="p-6"></div>} />
+            <Route path="/login" element={<Login/>} />
           </Routes>
         </main>
       </div>
