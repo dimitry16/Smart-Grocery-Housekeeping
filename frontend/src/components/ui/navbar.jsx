@@ -19,7 +19,7 @@ const navItems = [
     { label: 'Current Items', path: '/current_items' },
     { label: 'Recipes', path: '/recipes' },
     { label: 'Reports', path: '/reports' },
-    { label: 'Profile', path: '/profile' },
+    { label: 'Log In', path: '/login' },
 ]
 
 function Navbar() {
