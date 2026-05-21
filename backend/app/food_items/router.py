@@ -28,15 +28,15 @@ async def create_food_item(
 ):
     """Add food item to inventory.
 
-    Args:
-        current_user (CurrentUser): The authenticated user making the request.
-        food_item_data (FoodItemCreate): JSON data containing food inventory details.
-        db (Annotated[AsyncSession, Depends): Async database session
+    **Args**:
+    - **current_user (CurrentUser)**: The authenticated user making the request.
+    - **food_item_data (FoodItemCreate)**: JSON data containing food inventory details.
+    - **db (Annotated[AsyncSession, Depends)**: Async database session
 
-    Raises:
-        HTTPException: Raise 401 if user is not authorized.
-        HTTPException: Raise 404 if specified user not found.
-        HTTPException: Raise 409 if item with barcode already exists.
+    **Raises**:
+    - **HTTPException**: Raise 401 if user is not authorized.
+    - **HTTPException**: Raise 404 if specified user not found.
+    - **HTTPException**: Raise 409 if item with barcode already exists.
     """
 
     # Check if barcode is in the request, check if it exists in the pantry.
@@ -68,9 +68,9 @@ async def read_food_items(
 ):
     """Read user's items in their pantry.
 
-    Args:
-        current_user (CurrentUser): The authenticated user making the request.
-        db (Annotated[AsyncSession, Depends): Async database session
+    **Args**:
+    - **current_user (CurrentUser):** The authenticated user making the request.
+    - **db (Annotated[AsyncSession, Depends)**: Async database session
 
     """
     result = await services.get_food_items_by_user(user_id=current_user.id, db=db)
@@ -85,14 +85,14 @@ async def read_food_item(
 ):
     """Get a specific food item by their ID.
 
-    Args:
-        current_user (CurrentUser): The authenticated user making the request.
-        food_item_id (UUID): The UUID of the food item in the inventory.
-        db (Annotated[AsyncSession, Depends): Async database session
+    **Args**:
+    - **current_user (CurrentUser)**: The authenticated user making the request.
+    - **food_item_id (UUID)**: The UUID of the food item in the inventory.
+    - **db (Annotated[AsyncSession, Depends)**: Async database session
 
-    Raises:
-        HTTPException: 404 response if user does not exist.
-        HTTPException: 404 response if food item does not exist or user is not authorized to view the item..
+    **Raises**:
+    - **HTTPException**: 404 response if user does not exist.
+    - **HTTPException**: 404 response if food item does not exist or user is not authorized to view the item..
     """
     food_item = await services.get_food_item(food_item_id=food_item_id, db=db)
     if not food_item:
@@ -119,16 +119,16 @@ async def partial_update_food_item(
 
     - Omit any fields that remain unchanged.
 
-    Args:
-        current_user (CurrentUser): The authenticated user making the request.
-        food_item_id (UUID): The UUID of the food item in the inventory.
-        update_data (FoodItemUpdate): JSON data containing food inventory details to update.
-        db (Annotated[AsyncSession, Depends): Async database session
+    **Args**:
+    - **current_user (CurrentUser)**: The authenticated user making the request.
+    - **food_item_id (UUID)**: The UUID of the food item in the inventory.
+    - **update_data (FoodItemUpdate)**: JSON data containing food inventory details to update.
+    - **db (Annotated[AsyncSession, Depends)**: Async database session
 
-    Raises:
-        HTTPException: 401 response if user is not authorized to update food item.
-        HTTPException: 404 response if food item does not exist.
-        HTTPException: 409 response if barcode already exists.
+    **Raises**:
+    - **HTTPException**: 401 response if user is not authorized to update food item.
+    - **HTTPException**: 404 response if food item does not exist.
+    - **HTTPException**: 409 response if barcode already exists.
     """
 
     food_item = await services.get_food_item(food_item_id=food_item_id, db=db)
@@ -177,14 +177,14 @@ async def delete_food_item(
 ):
     """Delete food item by ID.
 
-    Args:
-        current_user (CurrentUser): The authenticated user making the request.
-        food_item_id (UUID): The UUID of the food item in the inventory.
-        db (Annotated[AsyncSession, Depends): Async database session
+    **Args**:
+    - **current_user (CurrentUser)**: The authenticated user making the request.
+    - **food_item_id (UUID)**: The UUID of the food item in the inventory.
+    - **db (Annotated[AsyncSession, Depends)**: Async database session
 
-    Raises:
-        HTTPException: 404 response if user does not exist.
-        HTTPException: 404 response if food item does not exist.
+    **Raises**:
+    - **HTTPException**: 404 response if user does not exist.
+    - **HTTPException**: 404 response if food item does not exist.
     """
     food_item = await services.get_food_item(food_item_id=food_item_id, db=db)
     if not food_item:
