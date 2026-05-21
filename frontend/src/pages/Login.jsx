@@ -8,7 +8,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardAction, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -19,16 +19,10 @@ function Login() {
     const [signUp, setSignUp] = useState(false)
 
     return (
-        <div className="flex min-h-screen items-center justify-center">
+        <div className="p-6 flex min-h-screen items-center justify-center">
             <Card className="w-full max-w-sm">
                 <CardHeader>
-                    <CardTitle>Login to your account</CardTitle>
-                    <CardAction>
-                        {/* Opens sign up dialog when clicked */}
-                        <Button variant="outline" className="rounded-full" onClick={() => setSignUp(true)}>
-                            Sign Up
-                        </Button>
-                    </CardAction>
+                    <CardTitle className="text-base text-xl">Login to your account</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <form id="login-form">
@@ -58,16 +52,25 @@ function Login() {
                         </div>
                     </form>
                 </CardContent>
-                <CardFooter className="flex-col gap-2 bg-blue-300">
-                    <Button type="submit" form="login-form" className="w-full">Log In</Button>
+                <CardFooter className="flex-col gap-2 bg-blue-100">
+                    <p className="text-base md:text-sm">
+                        Don't have an account?{' '}
+                        <span
+                            onClick={() => setSignUp(true)}
+                            className="text-base md:text-sm font-bold cursor-pointer text-blue-900 hover:text-blue-800"
+                        >
+                        Sign Up
+                        </span>
+                    </p>
+                    <Button type="submit" form="login-form" className="w-full text-lg text-medium font-bold">Log In</Button>
                 </CardFooter>
             </Card>
             {/* Sign up dialog */}
             <Dialog open={signUp} onOpenChange={setSignUp}>
                 <DialogContent className="max-w-sm bg-white">
                     <DialogHeader>
-                        <DialogTitle>Create an account</DialogTitle>
-                        <DialogDescription>Please enter your information below.</DialogDescription>
+                        <DialogTitle className="text-base text-xl">Create an account</DialogTitle>
+                        <DialogDescription className="text-base md:text-sm">Please enter your information below.</DialogDescription>
                     </DialogHeader>
                     <SignUpForm/>
                 </DialogContent>

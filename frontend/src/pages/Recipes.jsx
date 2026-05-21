@@ -47,7 +47,7 @@ function Recipes() {
                         key={category}
                         variant="outline"
                         size="sm"
-                        className={`rounded-full ${selectedCategory === category ? "bg-blue-300 border-blue-300" : "bg-white"}`}
+                        className={`rounded-full ${selectedCategory === category ? "bg-blue-300 border-blue-300" : "bg-white text-base md:text-sm"}`}
                         onClick={() => setSelectedCategory(category)}
                     >
                         {category}
@@ -74,7 +74,7 @@ function Recipes() {
                             <CardTitle>{recipe.title}</CardTitle>
                         </CardHeader>
                         <CardFooter className="bg-neutral-200">
-                            <Button className="w-full">View Recipe</Button>
+                            <Button className="w-full text-base md:text-sm">View Recipe</Button>
                         </CardFooter>
                     </Card>
                 ))}

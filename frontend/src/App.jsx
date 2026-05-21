@@ -19,7 +19,7 @@ function App() {
     <BrowserRouter>
       <div className="flex">
         <Navbar />
-        <main className="flex-1">
+        <main className="flex-1 md:ml-48">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/additem" element={<AddItem />} />

@@ -169,7 +169,7 @@ function AddItem() {
           <Button
             type="submit"
             disabled={submitting}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white"
+            className="bg-emerald-500 hover:bg-emerald-600 text-white text-base md:text-sm"
           >
             {submitting ? "Adding..." : "Add Item"}
           </Button>
@@ -178,6 +178,7 @@ function AddItem() {
             variant="outline"
             onClick={() => navigate(-1)}
             disabled={submitting}
+            className="text-base md:text-sm"
           >
             Cancel
           </Button>

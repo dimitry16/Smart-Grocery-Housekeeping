@@ -104,7 +104,7 @@ function Reports() {
                             <ItemList items={report.items}/>
                         </CardContent>
                         <CardFooter className="bg-neutral-200">
-                            <Button className="w-full">View Details</Button>
+                            <Button className="w-full text-base md:text-sm">View Details</Button>
                         </CardFooter>
                     </Card>
                 ))}
