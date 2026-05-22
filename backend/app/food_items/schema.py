@@ -29,7 +29,7 @@ class FoodItemUpdate(BaseModel):
     barcode: str | None = Field(None, max_length=100)
     category: str | None = Field(None, max_length=30)
     image_url: str | None = Field(None)
-    quantity: Decimal | None = Field(None, gt=0, max_digits=6, decimal_places=2)
+    quantity: Decimal = Field(Decimal("1"), gt=0, max_digits=6, decimal_places=2)
     unit: str | None = Field(None, max_length=30)
     expiration_date: datetime.date | None = Field(None)
 

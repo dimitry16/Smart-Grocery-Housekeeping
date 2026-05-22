@@ -27,6 +27,17 @@ const mockRecipes = [
     { id: 6, title: "Grilled Cheese Sandwich", image: null, category: "Lunch" },
 ]
 
+// Mock recipes used as placeholders
+// images to be added once Spoonacular API is implemented 
+const mockRecipes = [
+    { id: 1, title: "Salmon Alfredo", image: null, category: "Dinner" },
+    { id: 2, title: "Blueberry Waffles", image: null, category: "Breakfast" },
+    { id: 3, title: "Caesar Salad", image: null, category: "Lunch" },
+    { id: 4, title: "Cajun Chicken and Rice", image: null, category: "Dinner" },
+    { id: 5, title: "Veggie Scramble", image: null, category: "Breakfast" },
+    { id: 6, title: "Grilled Cheese Sandwich", image: null, category: "Lunch" },
+]
+
 function PantryTable({ items }) {
     return (
         <table className="w-full text-sm">
@@ -128,6 +139,18 @@ function Dashboard() {
                     </Link>
                 </div>
                 <PantryTable items={expiringSoon} />
+        {/* Food Items Table */}
+        <div className="rounded-lg border bg-white">
+            <div className="p-4 border-b bg-emerald-100 flex items-center justify-between">
+            <h2 className="text-2xl font-semibold text-gray-900">Current Items</h2>
+            <div className="flex gap-2">
+                <Link to="/additem">
+                <Button variant="outline" size="sm">Add Item</Button>
+                </Link>
+                <Link to="/current_items">
+                <Button variant="outline" size="sm">View All</Button>
+                </Link>
+            </div>
             </div>
 
             {/* Current Items Table */}
