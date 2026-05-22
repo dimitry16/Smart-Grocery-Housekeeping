@@ -1,9 +1,0 @@
-fastapi[standard]==0.135.3
-coverage==7.13.5
-httpx==0.28.1
-pytest==9.0.3
-pytest-cov==7.1.0
-ruff==0.15.10
-sqlalchemy==2.0.19
-cloud-sql-python-connector[pg8000]
-bcrypt
