@@ -21,7 +21,7 @@ async def test_create_food_item_success(client: AsyncClient):
     headers = user_auth_header(token)
 
     response = await client.post(
-        "v1/food-items",
+        "/v1/food-items",
         json={
             "name": "Whole Milk",
             "brand": "Horizon Organic",
@@ -72,7 +72,28 @@ async def test_create_food_item_name_only_success(client: AsyncClient):
 async def test_create_food_item_unauthorized(client: AsyncClient):
 
     response = await client.post(
-        "v1/food-items",
+        "/v1/food-items",
+        json={
+            "name": "Whole Milk",
+            "brand": "Horizon Organic",
+            "barcode": "742365008412",
+            "category": "Dairy",
+            "image_url": "https://images.example.com/products/horizon-whole-milk.jpg",
+            "quantity": 1.00,
+            "unit": "gallon",
+            "expiration_date": "2026-05-20",
+        },
+    )
+    assert response.status_code == 401
+    content = response.json()
+    assert content["detail"] == "Not authenticated"
+
+
+@pytest.mark.anyio
+async def test_create_food_item_duplicate_barcode(client: AsyncClient):
+
+    response = await client.post(
+        "/v1/food-items",
         json={
             "name": "Whole Milk",
             "brand": "Horizon Organic",
@@ -97,7 +118,7 @@ async def test_read_food_item_success(client: AsyncClient):
 
     # Create food item
     add_food_item = await client.post(
-        "v1/food-items",
+        "/v1/food-items",
         json={
             "name": "Whole Milk",
             "brand": "Horizon Organic",
@@ -147,7 +168,7 @@ async def test_read_food_items_success(client: AsyncClient):
     # Create 5 random food items
     for i in range(5):
         add_food_item = await client.post(
-            "v1/food-items",
+            "/v1/food-items",
             json={
                 "name": random_string(),
                 "brand": random_string(),
@@ -175,7 +196,7 @@ async def test_update_food_item_success(client: AsyncClient):
     headers = user_auth_header(token)
 
     add_food_item = await client.post(
-        "v1/food-items",
+        "/v1/food-items",
         json={
             "name": "Sourdough Bread",
             "brand": "Dave's Killer Bread",
@@ -203,7 +224,7 @@ async def test_update_food_item_success(client: AsyncClient):
     }
 
     response = await client.patch(
-        f"v1/food-items/{food_item_id}", json=updated_data, headers=headers
+        f"/v1/food-items/{food_item_id}", json=updated_data, headers=headers
     )
 
     assert response.status_code == 200
