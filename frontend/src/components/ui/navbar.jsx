@@ -24,6 +24,7 @@ const navItems = [
     { label: 'Barcode', path: '/barcode_scanner' },
     { label: 'Current Items', path: '/current_items' },
     { label: 'Recipes', path: '/recipes' },
+    { label: 'Saved Recipes', path: '/savedrecipes'},
     { label: 'Reports', path: '/reports' },
     { label: 'Log In', path: '/login' },
 ]

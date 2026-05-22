@@ -73,7 +73,9 @@ function SignUpForm() {
                         <p className="text-xs text-red-500">Passwords do not match</p>
                     )}
                 </div>
-                <Button className="text-lg font-bold flex-col gap-2 bg-blue-100 rounded-full" type="submit" disabled={passwordMismatch}>Create Account</Button>
+                <div className="flex justify-center">
+                <Button type="submit" className="text-lg font-bold flex-col gap-2 bg-blue-100 rounded-full" disabled={passwordMismatch}>Create Account</Button>
+                </div>
             </div>
         </form>
     )

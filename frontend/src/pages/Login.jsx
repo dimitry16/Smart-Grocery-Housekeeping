@@ -8,7 +8,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -25,7 +25,7 @@ function Login() {
                     <CardTitle className="text-base text-xl">Login to your account</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <form id="login-form">
+                    <form>
                         <div className="flex flex-col gap-6">
                             <div className="grid gap-2">
                                 <Label className="text-gray-700" htmlFor="email">
@@ -39,7 +39,7 @@ function Login() {
                                 required
                                 />
                             </div>
-                            <div className="grid gap-2">
+                            <div className="grid gap-2 mb-6">
                                 <Label className="text-gray-700" htmlFor="password">
                                     Password<span className="text-red-500">*</span>
                                 </Label>
@@ -50,20 +50,20 @@ function Login() {
                                 />
                             </div>
                         </div>
+                        <p className="text-base md:text-sm mb-6">
+                            Don't have an account?{' '}
+                            <span
+                                onClick={() => setSignUp(true)}
+                                className="text-base md:text-sm font-bold cursor-pointer text-blue-800 hover:text-blue-800"
+                            >
+                            Sign Up
+                            </span>
+                        </p>
+                        <div className="flex justify-center">
+                        <Button type="submit" className="text-lg font-bold bg-blue-100 rounded-full">Log In</Button>
+                        </div>
                     </form>
                 </CardContent>
-                <CardFooter className="flex-col gap-2 bg-blue-100">
-                    <p className="text-base md:text-sm">
-                        Don't have an account?{' '}
-                        <span
-                            onClick={() => setSignUp(true)}
-                            className="text-base md:text-sm font-bold cursor-pointer text-blue-900 hover:text-blue-800"
-                        >
-                        Sign Up
-                        </span>
-                    </p>
-                    <Button type="submit" form="login-form" className="w-full text-lg text-medium font-bold">Log In</Button>
-                </CardFooter>
             </Card>
             {/* Sign up dialog */}
             <Dialog open={signUp} onOpenChange={setSignUp}>

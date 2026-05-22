@@ -11,6 +11,7 @@ import Navbar from '@/components/ui/navbar'
 import AddItem from './pages/AddItem';
 import CurrentItems from './pages/CurrentItems';
 import Recipes from './pages/Recipes';
+import SavedRecipes from './pages/SavedRecipes';
 import Reports from './pages/Reports';
 import Login from './pages/Login';
 
@@ -27,6 +28,7 @@ function App() {
             <Route path="/barcode" element={<div className="p-6"></div>} />
             <Route path="/current_items" element={<CurrentItems />} />
             <Route path="/recipes" element={<Recipes/>} />
+            <Route path="/savedrecipes" element={<SavedRecipes/>} />
             <Route path="/reports" element={<Reports/>} />
             <Route path="/login" element={<Login/>} />
           </Routes>
