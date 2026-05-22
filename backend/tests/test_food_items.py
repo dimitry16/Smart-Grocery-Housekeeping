@@ -69,9 +69,12 @@ async def test_create_food_item_name_only_success(client: AsyncClient):
 
 
 @pytest.mark.anyio
-async def test_create_food_item_unauthorized(client: AsyncClient):
+async def test_create_food_item_duplicate_barcode(client: AsyncClient):
+    user = await create_test_user(client)
+    token = await login_user(client)
+    headers = user_auth_header(token)
 
-    response = await client.post(
+    add_item_1 = await client.post(
         "/v1/food-items",
         json={
             "name": "Whole Milk",
@@ -83,14 +86,35 @@ async def test_create_food_item_unauthorized(client: AsyncClient):
             "unit": "gallon",
             "expiration_date": "2026-05-20",
         },
+        headers=headers,
     )
-    assert response.status_code == 401
-    content = response.json()
-    assert content["detail"] == "Not authenticated"
+
+    assert add_item_1.status_code == 201
+    content = add_item_1.json()
+    assert content["user_id"] == user["id"]
+
+    add_item_2 = await client.post(
+        "/v1/food-items",
+        json={
+            "name": "Whole Milk",
+            "brand": "Horizon Organic",
+            "barcode": "742365008412",
+            "category": "Dairy",
+            "image_url": "https://images.example.com/products/horizon-whole-milk.jpg",
+            "quantity": 1.00,
+            "unit": "gallon",
+            "expiration_date": "2026-05-20",
+        },
+        headers=headers,
+    )
+
+    assert add_item_2.status_code == 409
+    content = add_item_2.json()
+    assert content["detail"] == "An item with this barcode already exists."
 
 
 @pytest.mark.anyio
-async def test_create_food_item_duplicate_barcode(client: AsyncClient):
+async def test_create_food_item_unauthorized(client: AsyncClient):
 
     response = await client.post(
         "/v1/food-items",
