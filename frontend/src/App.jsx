@@ -11,6 +11,7 @@ import Navbar from '@/components/ui/navbar'
 import AddItem from './pages/AddItem';
 import CurrentItems from './pages/CurrentItems';
 import Recipes from './pages/Recipes';
+import SavedRecipes from './pages/SavedRecipes';
 import Reports from './pages/Reports';
 import Login from './pages/Login';
 import BarcodeScanner from './pages/BarcodeScanner';
@@ -20,7 +21,7 @@ function App() {
     <BrowserRouter>
       <div className="flex">
         <Navbar />
-        <main className="flex-1">
+        <main className="flex-1 md:ml-48">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/additem" element={<AddItem />} />
@@ -28,6 +29,7 @@ function App() {
             <Route path="/barcode" element={<BarcodeScanner />} />
             <Route path="/current_items" element={<CurrentItems />} />
             <Route path="/recipes" element={<Recipes/>} />
+            <Route path="/savedrecipes" element={<SavedRecipes/>} />
             <Route path="/reports" element={<Reports/>} />
             <Route path="/login" element={<Login/>} />
           </Routes>
