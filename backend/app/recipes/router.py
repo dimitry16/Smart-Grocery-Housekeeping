@@ -10,10 +10,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from typing import Annotated
-from uuid import UUID
 
 from app.database.sqlconnector import get_db
-from app.utils import get_user_util
+from app.auth.services import CurrentUser
 
 from app.database.models import FoodItem as FoodItemModel
 
@@ -36,15 +35,13 @@ def calculate_expiration(user_items):
 
 @router.get("/get-recipe-suggestions", response_model=RecipeListResponse)
 async def get_recipe_suggestions(
-    user_id: UUID, db: Annotated[AsyncSession, Depends(get_db)]
+    current_user: CurrentUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
 ):
     """Gets food items for the user's current inventory that are expiring within 3 days for a user."""
 
-    # Check if user exists
-    await get_user_util(user_id, db)
-
     result = await db.execute(
-        select(FoodItemModel).where(FoodItemModel.user_id == user_id)
+        select(FoodItemModel).where(FoodItemModel.user_id == current_user.id)
     )
 
     user_items = result.scalars().all()
