@@ -4,63 +4,51 @@
 # Code Adapted from "FastAPI Docs - OAuth2 with Password (and hashing), Bearer with JWT tokens"
 # Source URL: https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/
 
-from datetime import timedelta
 from typing import Annotated
 from uuid import UUID
 
-import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
-from jwt.exceptions import InvalidTokenError
-from pydantic import ValidationError
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.auth import (
-    create_access_token,
-    get_password_hash,
-    oauth2_scheme,
-    verify_password,
-)
-from app.auth.schema import Token, TokenData
-from app.config import settings
+from app.auth.services import CurrentUser, get_password_hash
 from app.database.models import User as UserModel
 from app.database.sqlconnector import get_db
-from app.users.schema import UserCreate, UserPrivate, UserPublic, UserUpdate
-from app.utils import get_user_util
+from app.users.schema import UserCreate, UserPrivate, UserUpdate
+
+from . import services
 
 router = APIRouter()
 
 
 @router.post("", response_model=UserPrivate, status_code=status.HTTP_201_CREATED)
-async def create_user(user: UserCreate, db: Annotated[AsyncSession, Depends(get_db)]):
-    """Creates a new user.
+async def register_user(
+    user_create: UserCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    """
+    Creates a new user.
 
-    Args:
-        user (UserCreate): Pydantic Schema for validation check
-        db (Annotated[AsyncSession, Depends): Session
+    **Args**:
+    - **user (UserCreate)**: Pydantic Schema for validation check
+    - **db (Annotated[AsyncSession, Depends)**: Session
 
-    Raises:
-        HTTPException: Raises 409 on duplicate email.
+    **Raises**:
+    - **HTTPException**: Raises 409 on duplicate email.
     """
 
     # Check if email has already been registered
-    result = await db.execute(
-        select(UserModel).where(
-            func.lower(UserModel.email_address) == user.email_address.lower()
-        ),
-    )
-    existing_user = result.scalar_one_or_none()
+    user = await services.get_user_by_email(email=user_create.email_address, db=db)
 
-    if existing_user:
+    if user:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail="Email already registered."
         )
 
     new_user = UserModel(
-        name=user.name,
-        email_address=user.email_address.lower(),
-        password_hash=get_password_hash(user.password),
+        name=user_create.name,
+        email_address=user_create.email_address.lower(),
+        password_hash=get_password_hash(user_create.password),
     )
 
     db.add(new_user)
@@ -70,125 +58,49 @@ async def create_user(user: UserCreate, db: Annotated[AsyncSession, Depends(get_
     return new_user
 
 
-@router.post("/token")
-async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    db: Annotated[AsyncSession, Depends(get_db)],
-) -> Token:
-    """Authenticate a user and return an access token.
-
-    NOTE: "OAuth2PasswordRequestForm uses "username" field, but we will
-    use an email instead.
-
-    Args:
-        form_data (Annotated[OAuth2PasswordRequestForm, Depends): Login form data.
-        db (Annotated[AsyncSession, Depends): Database session.
-    Raises:
-        HTTPException: 401 if email or password is incorrect.
-
-    Returns:
-        Token: Access token and token type.
-    """
-
-    # Find user by email
-    result = await db.execute(
-        select(UserModel).where(
-            func.lower(UserModel.email_address) == form_data.username.lower()
-        ),
-    )
-    user = result.scalar_one_or_none()
-
-    # Verify user and password
-    if not user or not verify_password(form_data.password, user.password_hash):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    # Create an access token with user id
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": str(user.id)},
-        expires_delta=access_token_expires,
-    )
-    return Token(access_token=access_token, token_type="bearer")
-
-
 @router.get("/me", response_model=UserPrivate)
-async def get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)],
-    db: Annotated[AsyncSession, Depends(get_db)],
-):
-    """Get current user information.
-
-    Args:
-        token (Annotated[str, Depends): Received JWT token.
-        db (Annotated[AsyncSession, Depends): Database session.
-
-    Raises:
-        HTTPException: 401 Unauthorized if invalid or expired token.
-        HTTPException: 401 Unauthorized if user not found.
+async def read_user_info_me(current_user: CurrentUser):
     """
-    # Verify token and get user id
-    try:
-        payload = jwt.decode(
-            token,
-            settings.SECRET_KEY.get_secret_value(),
-            algorithms=[settings.ALGORITHM],
-            options={"require": ["exp", "sub"]},
-        )
-        user_id = TokenData(**payload)  # Validate the token payload
-    except InvalidTokenError, ValidationError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired token.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    Return information of current user.
 
-    # Look for user id in the database
-    user = await db.get(UserModel, user_id.sub)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found.",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    return user
-
-
-@router.get("/{user_id}", response_model=UserPublic)
-async def get_user(user_id: UUID, db: Annotated[AsyncSession, Depends(get_db)]):
-    """Get a user by their id.
-
-    Args:
-        user_id (UUID): Id of user.
-        db (Annotated[AsyncSession, Depends): Session
-
-    Raises:
-        HTTPException: Raises 404 if user not found.
+    **Args**:
+    - **current_user (CurrentUser)**: The authenticated user making the request.
     """
-    return await get_user_util(user_id, db)
+    return current_user
 
 
 @router.patch("/{user_id}", response_model=UserPrivate)
 async def partial_update_user(
-    user_id: UUID, user_data: UserUpdate, db: Annotated[AsyncSession, Depends(get_db)]
+    user_id: UUID,
+    current_user: CurrentUser,
+    user_data: UserUpdate,
+    db: Annotated[AsyncSession, Depends(get_db)],
 ):
-    """Update or partially update a user.
-
-    Args:
-        user_id (UUID): Id of user.
-        user_data (UserUpdate): original user data
-        db (Annotated[AsyncSession, Depends): session
-
-    Raises:
-        HTTPException: Raises 404 if user not found.
-        HTTPException: Raises 409 if email address is a duplicate.
     """
+    Update or partially update a user.
 
-    # Check of user exists
-    user = await get_user_util(user_id, db)
+    **Args**:
+    - **user_id (UUID)**: Id of user.
+    - **current_user (CurrentUser)**: The authenticated user making the request.
+    - **user_data (UserUpdate)**: original user data
+    - **db (Annotated[AsyncSession, Depends)**: session
+
+    **Raises**:
+    - **HTTPException**: 403 if user not authorized to update user.
+    - **HTTPException**: Raises 404 if user not found.
+    - **HTTPException**: Raises 409 if email address is a duplicate.
+    """
+    if user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to update this user.",
+        )
+
+    user = await db.get(UserModel, user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found."
+        )
 
     # only update fields that were sent in the request
     user_update_data = user_data.model_dump(exclude_unset=True)
@@ -221,17 +133,35 @@ async def partial_update_user(
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user(user_id: UUID, db: Annotated[AsyncSession, Depends(get_db)]):
-    """Delete a user.
-
-    Args:
-        user_id (UUID): Id of user
-        db (Annotated[AsyncSession, Depends): Session
-
-    Raises:
-        HTTPException: Raises 404 if user not found.
+async def delete_user(
+    user_id: UUID,
+    current_user: CurrentUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
     """
-    user = await get_user_util(user_id, db)
+    Delete a user.
+
+    **Args**:
+    - **user_id (UUID)**: Id of user
+    - **current_user (CurrentUser)**: The authenticated user making the request.
+    - **db (Annotated[AsyncSession, Depends)**: Session
+
+    **Raises**:
+    - **HTTPException**: 403 if user not authorized to delete user.
+    - **HTTPException**: 404 if user not found.
+    """
+
+    if user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to delete this user.",
+        )
+
+    user = await db.get(UserModel, user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found."
+        )
 
     await db.delete(user)
     await db.commit()

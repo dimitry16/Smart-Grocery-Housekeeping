@@ -29,7 +29,7 @@ async def login_user(
     password: str = "test1234",
 ) -> str:
     response = await client.post(
-        "v1/users/token",
+        "v1/tokens",
         data={
             "username": email_address,
             "password": password,
@@ -38,6 +38,11 @@ async def login_user(
 
     assert response.status_code == 200, f"Failed to login: {response.text}"
     return response.json()["access_token"]
+
+
+def user_auth_header(token: str) -> dict[str, str]:
+
+    return {"Authorization": f"Bearer {token}"}
 
 
 def random_string() -> str:
