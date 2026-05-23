@@ -13,10 +13,21 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import SignUpForm from "@/components/ui/SignUpForm"
+import { useAuth } from "@/lib/useAuth"
 
 function Login() {
     // Controls whether the sign up dialog is open or closed
     const [signUp, setSignUp] = useState(false)
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const { login, logout, isAuthenticated, user, token, deleteMeForceLogin } = useAuth()
+
+    function handleSubmit(event) {
+        event.preventDefault();
+        console.log({ email, password });
+    }
 
     return (
         <div className="p-6 flex min-h-screen items-center justify-center">
@@ -32,21 +43,24 @@ function Login() {
                                     Email<span className="text-red-500">*</span>
                                 </Label>
                                 <Input
-                                id="email"
-                                type="email"
-                                placeholder="example@email.com"
-                                className="placeholder:text-gray-400"
-                                required
+                                    id="email"
+                                    type="email"
+                                    value={email} 
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="example@email.com"
+                                    className="placeholder:text-gray-400"
+                                    required
                                 />
                             </div>
                             <div className="grid gap-2 mb-6">
                                 <Label className="text-gray-700" htmlFor="password">
                                     Password<span className="text-red-500">*</span>
                                 </Label>
-                                <Input 
-                                id="password" 
-                                type="password" 
-                                required 
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    value={password} onChange={(e) => setPassword(e.target.value)}
+                                    required
                                 />
                             </div>
                         </div>
@@ -56,13 +70,14 @@ function Login() {
                                 onClick={() => setSignUp(true)}
                                 className="text-base md:text-sm font-bold cursor-pointer text-blue-800 hover:text-blue-800"
                             >
-                            Sign Up
+                                Sign Up
                             </span>
                         </p>
                         <div className="flex justify-center">
-                        <Button type="submit" className="text-md font-bold bg-blue-100 rounded-full px-10 py-5">Log In</Button>
+                            <Button type="submit" className="text-md font-bold bg-blue-100 rounded-full px-10 py-5" onClick={handleSubmit}>Log In</Button>
                         </div>
                     </form>
+                <Button className="text-md font-bold bg-blue-100 rounded-full px-10 py-5" onClick={deleteMeForceLogin}>Log In Hack</Button>
                 </CardContent>
             </Card>
             {/* Sign up dialog */}
@@ -72,7 +87,7 @@ function Login() {
                         <DialogTitle className="text-base text-xl">Create an account</DialogTitle>
                         <DialogDescription className="text-base md:text-sm">Please enter your information below.</DialogDescription>
                     </DialogHeader>
-                    <SignUpForm/>
+                    <SignUpForm />
                 </DialogContent>
             </Dialog>
         </div>

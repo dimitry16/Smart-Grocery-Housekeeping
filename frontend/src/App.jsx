@@ -16,6 +16,7 @@ import Reports from './pages/Reports';
 import Login from './pages/Login';
 import BarcodeScanner from './pages/BarcodeScanner';
 import ObjectScanner from './pages/ObjectScanner';
+import { AuthGate } from './components/auth/AuthGate';
 
 function App() {
   return (
@@ -25,13 +26,16 @@ function App() {
         <main className="flex-1 md:ml-48">
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/additem" element={<AddItem />} />
-            <Route path="/scan-barcode" element={<BarcodeScanner />} />
-            <Route path="/scan-object" element={<ObjectScanner />} />
-            <Route path="/current_items" element={<CurrentItems />} />
-            <Route path="/recipes" element={<Recipes/>} />
-            <Route path="/savedrecipes" element={<SavedRecipes/>} />
-            <Route path="/reports" element={<Reports/>} />
+            <Route element={<AuthGate />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/additem" element={<AddItem />} />
+              <Route path="/scan-barcode" element={<BarcodeScanner />} />
+              <Route path="/scan-object" element={<ObjectScanner />} />
+              <Route path="/current_items" element={<CurrentItems />} />
+              <Route path="/recipes" element={<Recipes/>} />
+              <Route path="/savedrecipes" element={<SavedRecipes/>} />
+              <Route path="/reports" element={<Reports/>} />
+            </Route>
             <Route path="/login" element={<Login/>} />
           </Routes>
         </main>

@@ -15,6 +15,7 @@ import { NavLink } from 'react-router-dom'
 import logo from '@/assets/grocery.png'
 import { useState } from 'react'
 import clsx from 'clsx'
+import Logout from './Logout'
 
 
 const navItems = [
@@ -78,6 +79,9 @@ function Navbar() {
                             {item.label}
                         </NavLink>
                     ))}
+                    <div className="mt-60">
+                        <Logout />
+                    </div>
                     <div className="mt-auto pt-4 border-t text-xs text-muted-foreground">
                         <a href="https://www.flaticon.com/free-icon/grocery_1261052?term=groceries&page=1&position=2&origin=tag&related_id=1261052" target="_blank" rel="noopener noreferrer" className="hover:text-gray-600">
                             Groceries icon created by monkik - Flaticon
