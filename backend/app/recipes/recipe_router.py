@@ -28,12 +28,12 @@ def calculate_expiration(user_items):
     today = date.today()
     food_items = []
     for item in user_items:
-        item_dict = item.model_dump()
-        if item.expiration_date:
-            if item.expiration_date <= today + timedelta(days=3):
-                food_items.append(item_dict)
-    # tesing hardcoded food items for recipe suggestions
-    food_items = ["milk", "bread", "yogurt", "salmon", "olive oil"]
+        if item.expiration_date and item.expiration_date <= today + timedelta(days=3):
+            food_items.append(item.name)
+
+    # for tesing recipe suggestions
+    # food_items = ["milk", "strawberry", "yogurt", "vanilla", "whipped cream"]
+    print("Food items expiring soon:", food_items)
     return food_items
 
 
@@ -53,4 +53,5 @@ async def get_recipe_suggestions(
     user_items = result.scalars().all()
     items_expiring_soon = calculate_expiration(user_items)
     recipes = await get_recipes_from_ingredients(items_expiring_soon)
+
     return {"recipes": recipes}

@@ -28,7 +28,7 @@ async def get_recipes_from_ingredients(ingredients):
 
     params = {
         "ingredients": ingredient_list,
-        "number": 1,
+        "number": 2,
         "ranking": 1,
         "ignorePantry": False,
         "apiKey": settings.SPOONACULAR_API_KEY,
