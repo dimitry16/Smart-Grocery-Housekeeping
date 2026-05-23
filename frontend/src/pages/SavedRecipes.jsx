@@ -1,5 +1,5 @@
 // Name: Paula Tica
-// Date: 4/29/2026, updated 5/21/2026
+// Date: 5/21/2026
 // Citation:
 // Adapted code from shadcn
 // Adapted code from tailwindcss
@@ -8,7 +8,7 @@
 // URL: https://tailwindcss.com/docs/grid-template-columns 
 
 import { Button } from "@/components/ui/button"
-import { Card, CardAction, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 
 // Mock recipes used as placeholders
 // images to be added once Spoonacular API is implemented 
@@ -25,7 +25,7 @@ function Recipes() {
 
     return (
         <div className="p-6 max-w-5xl mx-auto space-y-6">
-            <h1 className="text-center text-4xl font-semibold text-gray-900">Recipes</h1>
+            <h1 className="text-center text-4xl font-semibold text-gray-900">Saved Recipes</h1>
             {/* Responsive grid layout */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {mockRecipes.map((recipe) => (
@@ -41,9 +41,8 @@ function Recipes() {
                         <CardHeader>
                             <CardTitle>{recipe.title}</CardTitle>
                         </CardHeader>
-                        <CardFooter className="flex justify-between bg-neutral-200">
+                        <CardFooter className="flex justify-center bg-neutral-200">
                             <Button type="submit" variant="outline" className="bg-white text-base md:text-sm">View Recipe</Button>
-                            <Button type="submit" className="bg-emerald-500 hover:bg-emerald-500 text-white text-base md:text-sm">Save</Button>
                         </CardFooter>
                     </Card>
                 ))}

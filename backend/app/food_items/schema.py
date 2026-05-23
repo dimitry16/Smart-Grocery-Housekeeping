@@ -23,12 +23,12 @@ class FoodItemCreate(FoodItemBase):
 
 
 class FoodItemUpdate(BaseModel):
-    name: str | None = Field(None, max_length=50)
+    name: str | None = Field(None, min_length=4, max_length=50)
     brand: str | None = Field(None, max_length=30)
     barcode: str | None = Field(None, max_length=100)
     category: str | None = Field(None, max_length=30)
     image_url: str | None = Field(None)
-    quantity: Decimal = Field(Decimal("1"), gt=0, max_digits=6, decimal_places=2)
+    quantity: Decimal | None = Field(None, gt=0, max_digits=6, decimal_places=2)
     unit: str | None = Field(None, max_length=30)
     expiration_date: datetime.date | None = Field(None)
 
@@ -38,3 +38,7 @@ class FoodItemResponse(FoodItemBase):
 
     id: UUID
     user_id: UUID
+
+
+class FoodItemsPublic(BaseModel):
+    data: list[FoodItemResponse]
