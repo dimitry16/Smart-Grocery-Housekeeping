@@ -31,9 +31,6 @@ def calculate_expiration(user_items):
         if item.expiration_date and item.expiration_date <= today + timedelta(days=3):
             food_items.append(item.name)
 
-    # for tesing recipe suggestions
-    # food_items = ["milk", "strawberry", "yogurt", "vanilla", "whipped cream"]
-    print("Food items expiring soon:", food_items)
     return food_items
 
 
@@ -41,7 +38,7 @@ def calculate_expiration(user_items):
 async def get_recipe_suggestions(
     user_id: UUID, db: Annotated[AsyncSession, Depends(get_db)]
 ):
-    """Get food items for the user's current inventory that are expiring within 3 days for a user."""
+    """Gets food items for the user's current inventory that are expiring within 3 days for a user."""
 
     # Check if user exists
     await get_user_util(user_id, db)

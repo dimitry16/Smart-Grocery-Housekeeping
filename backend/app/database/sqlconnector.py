@@ -60,10 +60,6 @@ async def init_db():
             expire_on_commit=False,
         )
 
-        # Create all tables
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
-
         return engine
     except Exception:
         # Close any partially created resources.

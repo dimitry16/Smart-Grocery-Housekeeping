@@ -2,8 +2,8 @@ from fastapi import APIRouter
 
 from app.food_items.router import router as food_items_router
 from app.users.router import router as users_router
-from app.external_api_services.vision_router import router as vision_router
-from app.recipes.recipe_router import router as recipe_router
+from app.external_api_services.router import router as vision_router
+from app.recipes.router import router as recipe_router
 
 api_router = APIRouter()
 
