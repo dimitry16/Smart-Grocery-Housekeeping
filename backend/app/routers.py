@@ -7,7 +7,7 @@ api_router = APIRouter()
 
 api_router.include_router(
     food_items_router,
-    prefix="/food-items",
+    prefix="/users/{user_id}/food-items",
     tags=["Food Items"],
 )
 api_router.include_router(users_router, prefix="/users", tags=["users"])
