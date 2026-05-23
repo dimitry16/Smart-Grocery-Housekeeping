@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.models import User as UserModel
 
 
-async def get_user_util(user_id: UUID, db: AsyncSession):
+async def get_user_util(user_id: UUID, db: AsyncSession) -> UserModel:
     """Helper function to get user.
 
     Args:
