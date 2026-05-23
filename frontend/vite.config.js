@@ -8,7 +8,7 @@
 
 // Name: Krystal Lu
 // Date: 05/22/26
-// Added VitePWA  
+// Added VitePWA
 
 import path from "path";
 import tailwindcss from "@tailwindcss/vite";
@@ -26,37 +26,37 @@ export default defineConfig({
         enabled: true,
       },
       manifest: {
-        "name": "Smart Grocery Housekeeping",
-        "short_name": "Smart Grocery",
-        "description": "Track your groceries and reduce food waste!",
+        name: "Smart Grocery Housekeeping",
+        short_name: "Smart Grocery",
+        description: "Track your groceries and reduce food waste!",
         theme_color: "#ffffff",
         background_color: "#ffffff",
         display: "standalone",
-        "icons": [
+        icons: [
           {
-            "src": "/pwa-192x192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "any"
+            src: "/pwa-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "any",
           },
           {
-            "src": "/pwa-512x512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any"
+            src: "/pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "any",
           },
           {
-            "src": "/pwa-maskable-192x192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "maskable"
+            src: "/pwa-maskable-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "maskable",
           },
           {
-            "src": "/pwa-maskable-512x512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "maskable"
-          }
+            src: "/pwa-maskable-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
+          },
         ],
       },
     }),
