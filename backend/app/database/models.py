@@ -65,7 +65,7 @@ class Recipe(Base):
         types.Uuid, primary_key=True, server_default=text("gen_random_uuid()")
     )
     title: Mapped[str] = mapped_column(String(50), nullable=False)
-    description: Mapped[Optional[str]] = mapped_column(String(600))
+    description: Mapped[Optional[str]] = mapped_column(String(2000))
     image_url: Mapped[Optional[str]] = mapped_column(Text)
     source_url: Mapped[Optional[str]] = mapped_column(Text)
 
