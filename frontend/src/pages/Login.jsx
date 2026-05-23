@@ -60,7 +60,7 @@ function Login() {
                             </span>
                         </p>
                         <div className="flex justify-center">
-                        <Button type="submit" className="text-lg font-bold bg-blue-100 rounded-full">Log In</Button>
+                        <Button type="submit" className="text-md font-bold bg-blue-100 rounded-full px-10 py-5">Log In</Button>
                         </div>
                     </form>
                 </CardContent>
