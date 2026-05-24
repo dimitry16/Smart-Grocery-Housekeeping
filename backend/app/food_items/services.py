@@ -45,4 +45,3 @@ async def get_food_item(food_item_id: UUID, db: AsyncSession) -> FoodItemModel |
     """
     food_item = await db.get(FoodItemModel, food_item_id)
     return food_item
-    
