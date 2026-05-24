@@ -14,6 +14,8 @@ import Recipes from './pages/Recipes';
 import SavedRecipes from './pages/SavedRecipes';
 import Reports from './pages/Reports';
 import Login from './pages/Login';
+import BarcodeScanner from './pages/BarcodeScanner';
+import ObjectScanner from './pages/ObjectScanner';
 
 function App() {
   return (
@@ -24,8 +26,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/additem" element={<AddItem />} />
-            <Route path="/scan" element={<div className="p-6"></div>} />
-            <Route path="/barcode" element={<div className="p-6"></div>} />
+            <Route path="/scan-barcode" element={<BarcodeScanner />} />
+            <Route path="/scan-object" element={<ObjectScanner />} />
             <Route path="/current_items" element={<CurrentItems />} />
             <Route path="/recipes" element={<Recipes/>} />
             <Route path="/savedrecipes" element={<SavedRecipes/>} />

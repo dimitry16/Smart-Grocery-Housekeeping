@@ -103,8 +103,8 @@ function Reports() {
                         <CardContent>
                             <ItemList items={report.items}/>
                         </CardContent>
-                        <CardFooter className="flex justify-center bg-neutral-200">
-                            <Button type="submit" variant="outline" className="bg-white text-base md:text-sm">View Details</Button>
+                        <CardFooter className="bg-neutral-200">
+                            <Button className="w-full">View Details</Button>
                         </CardFooter>
                     </Card>
                 ))}

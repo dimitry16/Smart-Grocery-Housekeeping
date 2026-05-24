@@ -1,11 +1,12 @@
-// CurrentItems.jsx — fetch all, edit (PATCH), delete (DELETE)
+// CurrentItems.jsx — fetch all, edit (PATCH), delete (DELETE) with expiration tracking
 // Name: Zilin Xu
 // Date: 4/22/2026
+// Last updated: 5/5/2026
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-
-const BASE_URL = `${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000"}/v1/food-items`;
+import { ExpiryBadge, rowColor } from "@/lib/expiry";
+import { FOOD_ITEMS_URL } from "@/lib/api";
 
 const CATEGORIES = [
   "Dairy", "Bakery", "Produce", "Seafood", "Meat",
@@ -18,6 +19,7 @@ function EditModal({ item, onClose, onSave }) {
     brand: item.brand ?? "",
     barcode: item.barcode ?? "",
     category: item.category ?? "",
+    expiration_date: item.expiration_date ?? "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -37,20 +39,19 @@ function EditModal({ item, onClose, onSave }) {
       brand: form.brand || null,
       barcode: form.barcode || null,
       category: form.category || null,
+      expiration_date: form.expiration_date || null,
     };
 
     try {
-      const response = await fetch(`${BASE_URL}/${item.id}`, {
+      const response = await fetch(`${FOOD_ITEMS_URL}/${item.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data?.detail ?? `Error ${response.status}`);
       }
-
       const updated = await response.json();
       onSave(updated);
     } catch (err) {
@@ -66,9 +67,7 @@ function EditModal({ item, onClose, onSave }) {
         <h2 className="text-xl font-semibold text-gray-900">Edit Item</h2>
 
         {error && (
-          <div className="rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-600">
-            {error}
-          </div>
+          <div className="rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -77,71 +76,61 @@ function EditModal({ item, onClose, onSave }) {
               Name <span className="text-red-500">*</span>
             </label>
             <input
-              id="edit-name"
-              name="name"
-              type="text"
-              required
-              maxLength={50}
-              value={form.name}
-              onChange={handleChange}
+              id="edit-name" name="name" type="text" required maxLength={50}
+              value={form.name} onChange={handleChange}
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
             />
           </div>
 
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-700" htmlFor="edit-brand">
-              Brand
-            </label>
+            <label className="text-sm font-medium text-gray-700" htmlFor="edit-brand">Brand</label>
             <input
-              id="edit-brand"
-              name="brand"
-              type="text"
-              maxLength={30}
-              value={form.brand}
-              onChange={handleChange}
+              id="edit-brand" name="brand" type="text" maxLength={30}
+              value={form.brand} onChange={handleChange}
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
             />
           </div>
 
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-700" htmlFor="edit-barcode">
-              Barcode
-            </label>
+            <label className="text-sm font-medium text-gray-700" htmlFor="edit-barcode">Barcode</label>
             <input
-              id="edit-barcode"
-              name="barcode"
-              type="text"
-              maxLength={100}
-              value={form.barcode}
-              onChange={handleChange}
+              id="edit-barcode" name="barcode" type="text" maxLength={100}
+              inputMode="numeric" pattern="[0-9]*"
+              value={form.barcode} onChange={handleChange}
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
             />
+            {form.barcode && !/^\d*$/.test(form.barcode) && (
+              <p className="text-xs text-red-500">Barcode must contain only digits.</p>
+            )}
           </div>
 
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-700" htmlFor="edit-category">
-              Category
-            </label>
+            <label className="text-sm font-medium text-gray-700" htmlFor="edit-category">Category</label>
             <select
-              id="edit-category"
-              name="category"
-              value={form.category}
-              onChange={handleChange}
+              id="edit-category" name="category" value={form.category} onChange={handleChange}
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 bg-white"
             >
               <option value="">— Select a category —</option>
-              {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
+              {CATEGORIES.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
             </select>
           </div>
 
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-gray-700" htmlFor="edit-expiration_date">
+              Expiration Date
+            </label>
+            <input
+              id="edit-expiration_date" name="expiration_date" type="date"
+              value={form.expiration_date} onChange={handleChange}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+            />
+            {form.expiration_date && new Date(form.expiration_date + "T00:00:00") < new Date(new Date().toDateString()) && (
+              <p className="text-xs text-yellow-600">This date is already expired.</p>
+            )}
+          </div>
+
           <div className="flex gap-3 pt-2">
-            <Button
-              type="submit"
-              disabled={submitting}
-              className="bg-emerald-500 hover:bg-emerald-600 text-white"
-            >
+            <Button type="submit" disabled={submitting} className="bg-emerald-500 hover:bg-emerald-600 text-white">
               {submitting ? "Saving..." : "Save Changes"}
             </Button>
             <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
@@ -163,16 +152,10 @@ function DeleteConfirmModal({ item, onClose, onConfirm, deleting }) {
           Are you sure you want to delete <span className="font-medium">{item.name}</span>? This cannot be undone.
         </p>
         <div className="flex gap-3">
-          <Button
-            onClick={onConfirm}
-            disabled={deleting}
-            className="bg-red-500 hover:bg-red-600 text-white"
-          >
+          <Button onClick={onConfirm} disabled={deleting} className="bg-red-500 hover:bg-red-600 text-white">
             {deleting ? "Deleting..." : "Delete"}
           </Button>
-          <Button variant="outline" onClick={onClose} disabled={deleting}>
-            Cancel
-          </Button>
+          <Button variant="outline" onClick={onClose} disabled={deleting}>Cancel</Button>
         </div>
       </div>
     </div>
@@ -190,7 +173,7 @@ function CurrentItems() {
   useEffect(() => {
     async function fetchItems() {
       try {
-        const response = await fetch(BASE_URL);
+        const response = await fetch(FOOD_ITEMS_URL);
         if (!response.ok) throw new Error(`Error ${response.status}`);
         const data = await response.json();
         setItems(data);
@@ -211,9 +194,7 @@ function CurrentItems() {
   async function handleDelete() {
     setDeleting(true);
     try {
-      const response = await fetch(`${BASE_URL}/${deletingItem.id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(`${FOOD_ITEMS_URL}/${deletingItem.id}`, { method: "DELETE" });
       if (!response.ok) throw new Error(`Error ${response.status}`);
       setItems((prev) => prev.filter((i) => i.id !== deletingItem.id));
       setDeletingItem(null);
@@ -224,13 +205,8 @@ function CurrentItems() {
     }
   }
 
-  if (loading) {
-    return <div className="p-6 text-center text-gray-500">Loading items...</div>;
-  }
-
-  if (error) {
-    return <div className="p-6 text-center text-red-500">Failed to load items: {error}</div>;
-  }
+  if (loading) return <div className="p-6 text-center text-gray-500">Loading items...</div>;
+  if (error) return <div className="p-6 text-center text-red-500">Failed to load items: {error}</div>;
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
@@ -244,35 +220,28 @@ function CurrentItems() {
               <th className="px-4 py-3 text-left">Brand</th>
               <th className="px-4 py-3 text-left">Category</th>
               <th className="px-4 py-3 text-left">Barcode</th>
+              <th className="px-4 py-3 text-left">Expiration</th>
               <th className="px-4 py-3 text-left">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {items.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-gray-400">
-                  No items found.
-                </td>
+                <td colSpan={6} className="px-4 py-6 text-center text-gray-400">No items found.</td>
               </tr>
             ) : (
               items.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50">
+                <tr key={item.id} className={`hover:brightness-95 ${rowColor(item.expiration_date)}`}>
                   <td className="px-4 py-3 font-medium">{item.name}</td>
                   <td className="px-4 py-3 text-gray-500">{item.brand ?? "—"}</td>
                   <td className="px-4 py-3">{item.category ?? "—"}</td>
                   <td className="px-4 py-3">{item.barcode ?? "—"}</td>
+                  <td className="px-4 py-3"><ExpiryBadge dateStr={item.expiration_date} /></td>
                   <td className="px-4 py-3">
                     <div className="flex gap-2">
+                      <Button size="sm" variant="outline" onClick={() => setEditingItem(item)}>Edit</Button>
                       <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setEditingItem(item)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
+                        size="sm" variant="outline"
                         className="text-red-500 border-red-300 hover:bg-red-50"
                         onClick={() => setDeletingItem(item)}
                       >
@@ -288,13 +257,8 @@ function CurrentItems() {
       </div>
 
       {editingItem && (
-        <EditModal
-          item={editingItem}
-          onClose={() => setEditingItem(null)}
-          onSave={handleSave}
-        />
+        <EditModal item={editingItem} onClose={() => setEditingItem(null)} onSave={handleSave} />
       )}
-
       {deletingItem && (
         <DeleteConfirmModal
           item={deletingItem}

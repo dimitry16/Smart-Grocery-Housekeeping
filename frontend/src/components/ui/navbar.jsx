@@ -20,8 +20,8 @@ import clsx from 'clsx'
 const navItems = [
     { label: 'Dashboard', path: '/' },
     { label: 'Add Item', path: '/additem' },
-    { label: 'Scan', path: '/item_detection' },
-    { label: 'Barcode', path: '/barcode_scanner' },
+    { label: 'Scan Barcode', path: '/scan-barcode' },
+    { label: 'Scan Object', path: '/scan-object' },
     { label: 'Current Items', path: '/current_items' },
     { label: 'Recipes', path: '/recipes' },
     { label: 'Saved Recipes', path: '/savedrecipes'},
