@@ -19,3 +19,4 @@ async def get_user_by_email(email: str, db: AsyncSession) -> UserModel | None:
     )
     user = result.scalar_one_or_none()
     return user
+    
