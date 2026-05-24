@@ -3,7 +3,12 @@ from uuid import uuid4
 import pytest
 from httpx import AsyncClient
 
-from tests.utils.utils import create_test_user, login_user, random_string, user_auth_header
+from tests.utils.utils import (
+    create_test_user,
+    login_user,
+    random_string,
+    user_auth_header,
+)
 
 
 async def create_food_item(
