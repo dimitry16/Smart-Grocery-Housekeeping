@@ -14,7 +14,7 @@ from typing import List, Optional
 from uuid import UUID
 
 import sqlalchemy
-from sqlalchemy import ForeignKey, String, Text, UniqueConstraint, text, types
+from sqlalchemy import DateTime, ForeignKey, String, Text, UniqueConstraint, text, types
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.sqlconnector import Base
@@ -57,6 +57,24 @@ class FoodItem(Base):
     __table_args__ = (UniqueConstraint("user_id", "barcode", name="user_barcode"),)
 
     owner: Mapped["User"] = relationship(back_populates="food_items")
+
+
+class UsageLog(Base):
+    __tablename__ = "usage_logs"
+    id: Mapped[UUID] = mapped_column(
+        types.Uuid, primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    user_id: Mapped[UUID] = mapped_column(
+        types.Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    food_item_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    category: Mapped[Optional[str]] = mapped_column(String(30))
+    action: Mapped[str] = mapped_column(String(10), nullable=False)
+    logged_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=text("now()"), nullable=False
+    )
+
+    owner: Mapped["User"] = relationship()
 
 
 class Recipe(Base):
