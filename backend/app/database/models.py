@@ -1,12 +1,10 @@
-# Name: Yasser Hernandez (hernayas)
-# Citation for the code below:
-# Date: 04/15/2026
-# Adapted from "ORM Quick Start"
-# Source URL: https://docs.sqlalchemy.org/en/20/orm/quickstart.html
-
 # Name: Krystal Lu (klu04)
 # Title: Removed UserFoodItem table and updated column constraints
 # Date: 05/08/2026
+
+# Name: Zilin Xu
+# Title: added UsageLog model
+# Date: 05/21/2026
 
 import datetime
 from decimal import Decimal
@@ -14,7 +12,7 @@ from typing import List, Optional
 from uuid import UUID
 
 import sqlalchemy
-from sqlalchemy import ForeignKey, String, Text, UniqueConstraint, text, types
+from sqlalchemy import DateTime, ForeignKey, String, Text, UniqueConstraint, text, types
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.sqlconnector import Base
@@ -59,13 +57,31 @@ class FoodItem(Base):
     owner: Mapped["User"] = relationship(back_populates="food_items")
 
 
+class UsageLog(Base):
+    __tablename__ = "usage_logs"
+    id: Mapped[UUID] = mapped_column(
+        types.Uuid, primary_key=True, server_default=text("gen_random_uuid()")
+    )
+    user_id: Mapped[UUID] = mapped_column(
+        types.Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    food_item_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    category: Mapped[Optional[str]] = mapped_column(String(30))
+    action: Mapped[str] = mapped_column(String(10), nullable=False)
+    logged_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=text("now()"), nullable=False
+    )
+
+    owner: Mapped["User"] = relationship()
+
+
 class Recipe(Base):
     __tablename__ = "recipes"
     id: Mapped[UUID] = mapped_column(
         types.Uuid, primary_key=True, server_default=text("gen_random_uuid()")
     )
     title: Mapped[str] = mapped_column(String(50), nullable=False)
-    description: Mapped[Optional[str]] = mapped_column(String(2000))
+    description: Mapped[Optional[str]] = mapped_column(String(600))
     image_url: Mapped[Optional[str]] = mapped_column(Text)
     source_url: Mapped[Optional[str]] = mapped_column(Text)
 
