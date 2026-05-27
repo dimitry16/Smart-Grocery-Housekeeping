@@ -29,6 +29,7 @@ class UsageAction(str, Enum):
 class LogUsageRequest(BaseModel):
     action: UsageAction
 
+
 router = APIRouter()
 
 
