@@ -192,7 +192,7 @@ function AllItems() {
   async function handleDelete() {
     setDeleting(true);
     try {
-      const response = await apiFetch(`${FOOD_ITEMS_URL}/${deletingItem.id}`, token, { method: "DELETE" });
+      await apiFetch(`${FOOD_ITEMS_URL}/${deletingItem.id}`, token, { method: "DELETE" });
       setItems((prev) => prev.filter((i) => i.id !== deletingItem.id));
       setDeletingItem(null);
     } catch (err) {
