@@ -9,7 +9,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import Navbar from '@/components/ui/navbar'
 import AddItem from './pages/AddItem';
-import CurrentItems from './pages/CurrentItems';
+import AllItems from './pages/AllItems';
 import Recipes from './pages/Recipes';
 import SavedRecipes from './pages/SavedRecipes';
 import Reports from './pages/Reports';
@@ -25,13 +25,12 @@ function App() {
         <Navbar />
         <main className="flex-1 md:ml-48">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
             <Route element={<AuthGate />}>
               <Route path="/" element={<Dashboard />} />
               <Route path="/additem" element={<AddItem />} />
               <Route path="/scan-barcode" element={<BarcodeScanner />} />
               <Route path="/scan-object" element={<ObjectScanner />} />
-              <Route path="/current_items" element={<CurrentItems />} />
+              <Route path="/all_items" element={<AllItems />} />
               <Route path="/recipes" element={<Recipes/>} />
               <Route path="/savedrecipes" element={<SavedRecipes/>} />
               <Route path="/reports" element={<Reports/>} />

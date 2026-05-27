@@ -6,20 +6,37 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useAuth } from "@/lib/useAuth"
+import { useNavigate } from "react-router-dom"
 
 function SignUpForm() {
     // Track input of each password field
+    
+    const [name, setName] = useState("")
+    const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
+
+    const { register, login } = useAuth();
+    const navigate = useNavigate();
 
     // Check if both password fields have been entered and don't match
     const passwordMismatch = confirmPassword.length > 0 && password !== confirmPassword
 
     // If passwords don't match, stop form submission
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault()
         if (passwordMismatch) {
             return
+        }
+        try {
+            console
+            await register({ name, email, password });
+            await login({ email, password });
+            navigate("/");
+        } catch (err) {
+            console.error(err)
+            alert(err.message)
         }
     }
 
@@ -29,8 +46,10 @@ function SignUpForm() {
                 <div className="grid gap-2">
                     <Label className="text-gray-700" htmlFor="signup-name">Name</Label>
                     <Input
-                    id="signup-name"
-                    type="text"
+                        id="signup-name"
+                        type="text"
+                        value={name}
+                        onChange={(event) => setName(event.target.value)}
                     />
                 </div>
                 <div className="grid gap-2">
@@ -38,11 +57,13 @@ function SignUpForm() {
                         Email<span className="text-red-500">*</span>
                     </Label>
                     <Input
-                    id="signup-email"
-                    type="email"
-                    placeholder="example@email.com"
-                    className="placeholder:text-gray-400"
-                    required
+                        id="signup-email"
+                        type="email"
+                        placeholder="example@email.com"
+                        className="placeholder:text-gray-400"
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
+                        required
                     />
                 </div>
                 <div className="grid gap-2">
@@ -50,11 +71,11 @@ function SignUpForm() {
                         Password<span className="text-red-500">*</span>
                     </Label>
                     <Input
-                    id="signup-password"
-                    type="password"
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    required
+                        id="signup-password"
+                        type="password"
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
+                        required
                     />
                 </div>
                 <div className="grid gap-2">
@@ -62,11 +83,11 @@ function SignUpForm() {
                         Confirm Password<span className="text-red-500">*</span>
                         </Label>
                     <Input
-                    id="confirm-password"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(event) => setConfirmPassword(event.target.value)}
-                    required
+                        id="confirm-password"
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(event) => setConfirmPassword(event.target.value)}
+                        required
                     />
                     {/* Show error message as soon as there is a mismatch */}
                     {passwordMismatch && (

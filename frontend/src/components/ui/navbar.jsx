@@ -23,7 +23,7 @@ const navItems = [
     { label: 'Add Item', path: '/additem' },
     { label: 'Scan Barcode', path: '/scan-barcode' },
     { label: 'Scan Object', path: '/scan-object' },
-    { label: 'Current Items', path: '/current_items' },
+    { label: 'All Items', path: '/all_items' },
     { label: 'Recipes', path: '/recipes' },
     { label: 'Saved Recipes', path: '/savedrecipes'},
     { label: 'Reports', path: '/reports' },
@@ -79,7 +79,7 @@ function Navbar() {
                             {item.label}
                         </NavLink>
                     ))}
-                    <div className="mt-60">
+                    <div className="mt-50">
                         <Logout />
                     </div>
                     <div className="mt-auto pt-4 border-t text-xs text-muted-foreground">

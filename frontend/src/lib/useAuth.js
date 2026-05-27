@@ -2,6 +2,7 @@
 // Date: 05/23/2026
 
 import { useState, useEffect } from "react";
+import { API_BASE } from "./api"; // adjust path as needed
 
 let listeners = [];
 let state = {
@@ -23,16 +24,47 @@ export function useAuth() {
         return () => { listeners = listeners.filter((l) => l !== listener); };
     }, []);
 
-    const login = async (credentials) => {
-        const res = await fetch("/api/auth/login", {
+    const login = async ({ email, password }) => {
+        const body = new URLSearchParams({
+            username: email, // OAuth2PasswordRequestForm uses "username" but accepts email per API note
+            password,
+        });
+
+        const res = await fetch(`${API_BASE}/v1/tokens`, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body,
+        });
+
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail ?? `Login failed (${res.status})`);
+        }
+
+        const { access_token } = await res.json();
+
+        // /v1/tokens only returns a token — fetch the user separately if needed,
+        // or decode the JWT. For now we store email as a lightweight user object.
+        const user = { email };
+
+        localStorage.setItem("token", access_token);
+        localStorage.setItem("user", JSON.stringify(user));
+        setState({ token: access_token, user });
+    };
+
+    const register = async ({ name, email, password }) => {
+        const res = await fetch(`${API_BASE}/v1/users`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(credentials),
+            body: JSON.stringify({ name, email_address: email, password }),
         });
-        const { accessToken, user } = await res.json();
-        localStorage.setItem("token", accessToken);
-        localStorage.setItem("user", JSON.stringify(user));
-        setState({ token: accessToken, user });
+
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.detail ?? `Registration failed (${res.status})`);
+        }
+
+        return res.json(); // { id, name, email_address }
     };
 
     const logout = () => {
@@ -43,13 +75,5 @@ export function useAuth() {
 
     const isAuthenticated = () => !!state.token;
 
-    const deleteMeForceLogin = () => {
-        const accessToken = "abcd";
-        const user = "john";
-        localStorage.setItem("token", accessToken);
-        localStorage.setItem("user", JSON.stringify(user));
-        setState({ token: accessToken, user });
-    }
-
-    return { login, logout, isAuthenticated, user: state.user, token: state.token, deleteMeForceLogin };
+    return { login, register, logout, isAuthenticated, user: state.user, token: state.token };
 }

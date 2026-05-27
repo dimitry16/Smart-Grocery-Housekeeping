@@ -6,7 +6,8 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ExpiryBadge, rowColor } from "@/lib/expiry";
-import { FOOD_ITEMS_URL } from "@/lib/api";
+import { FOOD_ITEMS_URL, apiFetch } from "@/lib/api";
+import { useAuth } from "@/lib/useAuth"
 
 const CATEGORIES = [
   "Dairy", "Bakery", "Produce", "Seafood", "Meat",
@@ -23,6 +24,9 @@ function EditModal({ item, onClose, onSave }) {
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+
+  const { token } = useAuth();
+
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -43,16 +47,10 @@ function EditModal({ item, onClose, onSave }) {
     };
 
     try {
-      const response = await fetch(`${FOOD_ITEMS_URL}/${item.id}`, {
+      const response = await apiFetch(`${FOOD_ITEMS_URL}/${item.id}`, token, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data?.detail ?? `Error ${response.status}`);
-      }
-      const updated = await response.json();
       onSave(updated);
     } catch (err) {
       setError(err.message);
@@ -162,7 +160,7 @@ function DeleteConfirmModal({ item, onClose, onConfirm, deleting }) {
   );
 }
 
-function CurrentItems() {
+function AllItems() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -170,12 +168,12 @@ function CurrentItems() {
   const [deletingItem, setDeletingItem] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
+  const { token } = useAuth();
+
   useEffect(() => {
     async function fetchItems() {
       try {
-        const response = await fetch(FOOD_ITEMS_URL);
-        if (!response.ok) throw new Error(`Error ${response.status}`);
-        const data = await response.json();
+        const data = await apiFetch(FOOD_ITEMS_URL, token);
         setItems(data);
       } catch (err) {
         setError(err.message);
@@ -194,8 +192,7 @@ function CurrentItems() {
   async function handleDelete() {
     setDeleting(true);
     try {
-      const response = await fetch(`${FOOD_ITEMS_URL}/${deletingItem.id}`, { method: "DELETE" });
-      if (!response.ok) throw new Error(`Error ${response.status}`);
+      const response = await apiFetch(`${FOOD_ITEMS_URL}/${deletingItem.id}`, token, { method: "DELETE" });
       setItems((prev) => prev.filter((i) => i.id !== deletingItem.id));
       setDeletingItem(null);
     } catch (err) {
@@ -230,7 +227,7 @@ function CurrentItems() {
                 <td colSpan={6} className="px-4 py-6 text-center text-gray-400">No items found.</td>
               </tr>
             ) : (
-              items.map((item) => (
+              items['data'].map((item) => (
                 <tr key={item.id} className={`hover:brightness-95 ${rowColor(item.expiration_date)}`}>
                   <td className="px-4 py-3 font-medium">{item.name}</td>
                   <td className="px-4 py-3 text-gray-500">{item.brand ?? "—"}</td>
@@ -271,4 +268,4 @@ function CurrentItems() {
   );
 }
 
-export default CurrentItems;
+export default AllItems;

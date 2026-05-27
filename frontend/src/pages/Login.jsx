@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import SignUpForm from "@/components/ui/SignUpForm"
 import { useAuth } from "@/lib/useAuth"
+import { useNavigate } from "react-router-dom"
 
 function Login() {
     // Controls whether the sign up dialog is open or closed
@@ -22,11 +23,14 @@ function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const { login, logout, isAuthenticated, user, token, deleteMeForceLogin } = useAuth()
+    const { login } = useAuth()
+    const navigate = useNavigate();
 
-    function handleSubmit(event) {
+
+    async function handleSubmit(event) {
         event.preventDefault();
-        console.log({ email, password });
+        await login({ email, password })
+        navigate("/")
     }
 
     return (
@@ -77,7 +81,6 @@ function Login() {
                             <Button type="submit" className="text-md font-bold bg-blue-100 rounded-full px-10 py-5" onClick={handleSubmit}>Log In</Button>
                         </div>
                     </form>
-                <Button className="text-md font-bold bg-blue-100 rounded-full px-10 py-5" onClick={deleteMeForceLogin}>Log In Hack</Button>
                 </CardContent>
             </Card>
             {/* Sign up dialog */}
