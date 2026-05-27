@@ -7,11 +7,11 @@
 // URL: https://ui.shadcn.com/colors
 // URL: https://tailwindcss.com/docs/grid-template-columns 
 
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button"
 import { Card, CardAction, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { RECIPES_URL } from "@/lib/api";
 
-// Mock recipes used as placeholders
-// images to be added once Spoonacular API is implemented 
 const mockRecipes = [
     {id: 1, title: "Salmon Alfredo", image: null},
     {id: 2, title: "Blueberry Waffles", image: null},
@@ -22,13 +22,70 @@ const mockRecipes = [
 ]
 
 function Recipes() {
+    const [recipes, setRecipes] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        async function fetchRecipes() {
+            try {
+                const response = await fetch(RECIPES_URL);
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
+                }
+                const data = await response.json();
+                setRecipes(data);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchRecipes();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="p-6 max-w-5xl mx-auto text-center text-gray-500">
+                Loading recipes...
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="p-6 max-w-5xl mx-auto text-center text-red-500">
+                Failed to load recipes: {error}
+            </div>
+        );
+    }
+
+    async function handleSaveRecipe(recipe) {
+        try {
+            const response = await fetch(RECIPES_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(recipe),
+            });
+            if (!response.ok) {
+                const data = await response.json().catch(() => null);
+                throw new Error(data?.detail ?? `Error ${response.status}: ${response.statusText}`);
+            }
+            alert("Recipe saved successfully!");
+        } catch (err) {
+            alert(`Failed to save recipe: ${err.message}`);
+        }
+    }
 
     return (
         <div className="p-6 max-w-5xl mx-auto space-y-6">
             <h1 className="text-center text-4xl font-semibold text-gray-900">Recipes</h1>
             {/* Responsive grid layout */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {mockRecipes.map((recipe) => (
+                {recipes.map((recipe) => (
                     // Display a card for each recipe
                     // Each card includes an image, header, title, and footer
                     <Card key={recipe.id} className="relative mx-auto w-full pt-0">
@@ -43,7 +100,13 @@ function Recipes() {
                         </CardHeader>
                         <CardFooter className="flex justify-between bg-neutral-200">
                             <Button type="submit" variant="outline" className="bg-white text-base md:text-sm">View Recipe</Button>
-                            <Button type="submit" className="bg-emerald-500 hover:bg-emerald-500 text-white text-base md:text-sm">Save</Button>
+                            <Button 
+                                type="button" 
+                                onClick={() => handleSaveRecipe(recipe)}
+                                className="bg-emerald-500 hover:bg-emerald-600 text-white text-base md:text-sm"
+                            >
+                                Save
+                            </Button>
                         </CardFooter>
                     </Card>
                 ))}

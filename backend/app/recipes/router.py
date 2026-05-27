@@ -5,7 +5,7 @@
 
 from datetime import date, timedelta
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -16,8 +16,11 @@ from app.auth.services import CurrentUser
 
 from app.database.models import FoodItem as FoodItemModel
 
+# Ensure the SavedRecipe model matches your definition in app.database.models
+from app.database.models import Recipe as RecipeModel
+
 from app.external_api_services.recipe_api import get_recipes_from_ingredients
-from app.recipes.schema import RecipeListResponse
+from app.recipes.schema import RecipeListResponse, RecipeCreate, RecipeResponse
 
 router = APIRouter()
 
@@ -49,3 +52,30 @@ async def get_recipe_suggestions(
     recipes = await get_recipes_from_ingredients(items_expiring_soon)
 
     return {"recipes": recipes}
+
+
+@router.post("", response_model=RecipeResponse, status_code=status.HTTP_201_CREATED)
+async def save_recipe(
+    recipe_data: RecipeCreate,
+    current_user: CurrentUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    """Saves a recipe to user's recipes."""
+
+    # Check if the recipe is already saved by the user
+    result = await db.execute(
+        select(RecipeModel).where(
+            RecipeModel.user_id == current_user.id,
+            RecipeModel.recipe_id == recipe_data.id,
+        )
+    )
+    if result.scalar_one_or_none():
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="Recipe is already saved."
+        )
+
+    new_saved_recipe = RecipeModel(**recipe_data.model_dump(), user_id=current_user.id)
+    db.add(new_saved_recipe)
+    await db.commit()
+    await db.refresh(new_saved_recipe)
+    return new_saved_recipe
