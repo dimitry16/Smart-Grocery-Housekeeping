@@ -51,7 +51,7 @@ function EditModal({ item, onClose, onSave }) {
         method: "PATCH",
         body: JSON.stringify(payload),
       });
-      onSave(updated);
+      onSave(response);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -174,7 +174,7 @@ function AllItems() {
     async function fetchItems() {
       try {
         const data = await apiFetch(FOOD_ITEMS_URL, token);
-        setItems(data);
+        setItems(data['data']);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -227,7 +227,7 @@ function AllItems() {
                 <td colSpan={6} className="px-4 py-6 text-center text-gray-400">No items found.</td>
               </tr>
             ) : (
-              items['data'].map((item) => (
+              items.map((item) => (
                 <tr key={item.id} className={`hover:brightness-95 ${rowColor(item.expiration_date)}`}>
                   <td className="px-4 py-3 font-medium">{item.name}</td>
                   <td className="px-4 py-3 text-gray-500">{item.brand ?? "—"}</td>
