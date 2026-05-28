@@ -7,6 +7,8 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { FOOD_ITEMS_URL } from "@/lib/api";
+import { useAuth } from "@/lib/useAuth"
+import { apiFetch } from "@/lib/api"
 
 const CATEGORIES = [
   "Dairy", "Bakery", "Produce", "Seafood", "Meat",
@@ -16,6 +18,8 @@ const CATEGORIES = [
 function AddItem() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { token } = useAuth();
 
   // Pre-fill from barcode scanner if available
   const prefill = location.state ?? {};
@@ -49,16 +53,10 @@ function AddItem() {
     };
 
     try {
-      const response = await fetch(FOOD_ITEMS_URL, {
+      const response = await apiFetch(FOOD_ITEMS_URL, token, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data?.detail ?? `Error ${response.status}`);
-      }
 
       navigate("/");
     } catch (err) {

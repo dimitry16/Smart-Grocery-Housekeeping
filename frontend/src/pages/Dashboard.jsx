@@ -1,7 +1,7 @@
 // Name: Paula Tica
 // Date: 4/19/2026
 // Edited: Zilin Xu on 5/22/2026
-// Edited: Paula Tica on 4/29/2026
+// Responsive design: Paula Tica on 5/27/2026
 // Citation:
 // Adapted code from shadcn docs
 // Adapted code from Create Future And Past Dates From Today
@@ -13,10 +13,11 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Badge } from "@/components/ui/badge"
-import { Card, CardAction, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { daysUntilExpiry, ExpiryBadge, rowColor } from "@/lib/expiry";
 import { FOOD_ITEMS_URL } from "@/lib/api";
+import { useAuth } from "@/lib/useAuth"
+import { apiFetch } from "@/lib/api"
 
 const mockRecipes = [
     { id: 1, title: "Salmon Alfredo", image: null, category: "Dinner" },
@@ -29,36 +30,38 @@ const mockRecipes = [
 
 function PantryTable({ items }) {
     return (
-        <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
-                <tr>
-                    <th className="px-4 py-3 text-left">Name</th>
-                    <th className="px-4 py-3 text-left">Brand</th>
-                    <th className="px-4 py-3 text-left">Category</th>
-                    <th className="px-4 py-3 text-left">Barcode</th>
-                    <th className="px-4 py-3 text-left">Expiration</th>
-                </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-                {items.length === 0 ? (
+        <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+                <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
                     <tr>
-                        <td colSpan={5} className="px-4 py-3 text-center text-gray-400">No items</td>
+                        <th className="px-3 py-2 md:px-4 md:py-3 text-left">Name</th>
+                        <th className="px-3 py-2 md:px-4 md:py-3 text-left hidden md:table-cell">Brand</th>
+                        <th className="px-3 py-2 md:px-4 md:py-3 text-left">Category</th>
+                        <th className="px-3 py-2 md:px-4 md:py-3 text-left hidden md:table-cell">Barcode</th>
+                        <th className="px-3 py-2 md:px-4 md:py-3 text-left">Expiration</th>
                     </tr>
-                ) : (
-                    items.map((item) => (
-                        <tr key={item.id} className={`hover:brightness-95 ${rowColor(item.expiration_date)}`}>
-                            <td className="px-4 py-3 font-medium">{item.name}</td>
-                            <td className="px-4 py-3 text-gray-500">{item.brand ?? "—"}</td>
-                            <td className="px-4 py-3">{item.category ?? "—"}</td>
-                            <td className="px-4 py-3">{item.barcode ?? "—"}</td>
-                            <td className="px-4 py-3">
-                                <ExpiryBadge dateStr={item.expiration_date} />
-                            </td>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                    {items.length === 0 ? (
+                        <tr>
+                            <td colSpan={5} className="px-3 py-3 text-center text-gray-400">No items</td>
                         </tr>
-                    ))
-                )}
-            </tbody>
-        </table>
+                    ) : (
+                        items.map((item) => (
+                            <tr key={item.id} className={`hover:brightness-95 ${rowColor(item.expiration_date)}`}>
+                                <td className="px-3 py-2 md:px-4 md:py-3 font-medium">{item.name}</td>
+                                <td className="px-3 py-2 md:px-4 md:py-3 text-gray-500 hidden md:table-cell">{item.brand ?? "—"}</td>
+                                <td className="px-3 py-2 md:px-4 md:py-3">{item.category ?? "—"}</td>
+                                <td className="px-3 py-2 md:px-4 md:py-3 hidden md:table-cell">{item.barcode ?? "—"}</td>
+                                <td className="px-3 py-2 md:px-4 md:py-3">
+                                    <ExpiryBadge dateStr={item.expiration_date} />
+                                </td>
+                            </tr>
+                        ))
+                    )}
+                </tbody>
+            </table>
+        </div>
     );
 }
 
@@ -67,14 +70,12 @@ function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const { token } = useAuth();
+
     useEffect(() => {
         async function fetchFoodItems() {
             try {
-                const response = await fetch(FOOD_ITEMS_URL);
-                if (!response.ok) {
-                    throw new Error(`Error ${response.status}: ${response.statusText}`);
-                }
-                const data = await response.json();
+                const data = await apiFetch(FOOD_ITEMS_URL, token);
                 setFoodItems(data);
             } catch (err) {
                 setError(err.message);
@@ -84,7 +85,7 @@ function Dashboard() {
         }
 
         fetchFoodItems();
-    }, []);
+    }, [token]);
 
     if (loading) {
         return (
@@ -101,29 +102,28 @@ function Dashboard() {
             </div>
         );
     }
-
-    const expiringSoon = foodItems.filter(item => {
+    const expiringSoon = foodItems['data'].filter(item => {
         const days = daysUntilExpiry(item.expiration_date);
         return days !== null && days <= 3;
     });
 
-    const currentItems = foodItems.filter(item => {
+    const currentItems = foodItems['data'].filter(item => {
         const days = daysUntilExpiry(item.expiration_date);
         return days === null || days > 3;
     });
 
     return (
         <div className="p-6 max-w-5xl mx-auto space-y-6">
-            <h1 className="text-center text-4xl font-semibold text-gray-900">Smart Grocery Housekeeping</h1>
+            <h1 className="text-center text-2xl md:text-4xl font-semibold text-gray-900 pl-8 md:pl-0">Smart Grocery Housekeeping</h1>
 
             {/* Expiring Soon Table */}
             <div className="rounded-lg border border-red-400 bg-white">
-                <div className="p-4 border-b border-red-400 bg-red-200 flex items-center justify-between">
+                <div className="p-3 md:p-4 border-b border-red-400 bg-red-200 flex items-center justify-between gap-2">
                     <div>
-                        <h2 className="text-2xl font-semibold text-gray-900">Expiring Soon</h2>
-                        <p className="text-sm text-red-500">Expiring within 3 days or already expired</p>
+                        <h2 className="text-lg md:text-2xl font-semibold text-gray-900">Expiring Soon</h2>
+                        <p className="text-xs md:text-sm text-red-500">Expiring within 3 days or already expired</p>
                     </div>
-                    <Link to="/current_items">
+                    <Link to="/all_items">
                         <Button variant="outline" size="sm">View All</Button>
                     </Link>
                 </div>
@@ -132,13 +132,13 @@ function Dashboard() {
 
             {/* Current Items Table */}
             <div className="rounded-lg border bg-white">
-                <div className="p-4 border-b bg-emerald-200 flex items-center justify-between">
-                    <h2 className="text-2xl font-semibold text-gray-900">Current Items</h2>
-                    <div className="flex gap-2">
+                <div className="p-3 md:p-4 border-b bg-emerald-200 flex items-center justify-between gap-2">
+                    <h2 className="text-lg md:text-2xl font-semibold text-gray-900">Current Items</h2>
+                    <div className="flex gap-2 shrink-0">
                         <Link to="/additem">
                             <Button variant="outline" size="sm">Add Item</Button>
                         </Link>
-                        <Link to="/current_items">
+                        <Link to="/all_items">
                             <Button variant="outline" size="sm">View All</Button>
                         </Link>
                     </div>
@@ -148,8 +148,8 @@ function Dashboard() {
 
             {/* Recipes Section */}
             <div className="rounded-lg border bg-white">
-                <div className="p-4 border-b bg-olive-200 flex items-center justify-between">
-                    <h2 className="text-2xl font-semibold text-gray-900">Recipes</h2>
+                <div className="p-3 md:p-4 border-b bg-olive-200 flex items-center justify-between gap-2">
+                    <h2 className="text-lg md:text-2xl font-semibold text-gray-900">Recipes</h2>
                     <Link to="/recipes">
                         <Button variant="outline" size="sm">View All</Button>
                     </Link>
@@ -164,9 +164,6 @@ function Dashboard() {
                                 className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
                             />
                             <CardHeader>
-                                <CardAction>
-                                    <Badge variant="secondary">{recipe.category}</Badge>
-                                </CardAction>
                                 <CardTitle className="text-sm">{recipe.title}</CardTitle>
                             </CardHeader>
                         </Card>
