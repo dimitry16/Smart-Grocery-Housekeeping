@@ -10,7 +10,8 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button"
 import { Card, CardAction, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { RECIPES_URL } from "@/lib/api";
+import { RECIPES_URL, apiFetch } from "@/lib/api";
+import { useAuth } from "@/lib/useAuth"
 
 const mockRecipes = [
     {id: 1, title: "Salmon Alfredo", image: null},
@@ -26,15 +27,13 @@ function Recipes() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const { token } = useAuth();
+
     useEffect(() => {
         async function fetchRecipes() {
             try {
-                const response = await fetch(RECIPES_URL);
-                if (!response.ok) {
-                    throw new Error(`Error ${response.status}: ${response.statusText}`);
-                }
-                const data = await response.json();
-                setRecipes(data);
+                const data = await apiFetch(RECIPES_URL, token);
+                setRecipes(data.recipes || []);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -43,7 +42,7 @@ function Recipes() {
         }
 
         fetchRecipes();
-    }, []);
+    }, [token]);
 
     if (loading) {
         return (
@@ -63,17 +62,10 @@ function Recipes() {
 
     async function handleSaveRecipe(recipe) {
         try {
-            const response = await fetch(RECIPES_URL, {
+            await apiFetch(RECIPES_URL, token, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
                 body: JSON.stringify(recipe),
             });
-            if (!response.ok) {
-                const data = await response.json().catch(() => null);
-                throw new Error(data?.detail ?? `Error ${response.status}: ${response.statusText}`);
-            }
             alert("Recipe saved successfully!");
         } catch (err) {
             alert(`Failed to save recipe: ${err.message}`);
@@ -88,10 +80,10 @@ function Recipes() {
                 {recipes.map((recipe) => (
                     // Display a card for each recipe
                     // Each card includes an image, header, title, and footer
-                    <Card key={recipe.id} className="relative mx-auto w-full pt-0">
+                    <Card key={recipe.title || index} className="relative mx-auto w-full pt-0">
                         <div className="absolute inset-0 z-30 aspect-video bg-black/10" />
                         <img
-                            src={recipe.image ?? "https://placehold.co/640x360"}
+                            src={recipe.image_url ?? "https://placehold.co/640x360"}
                             alt={recipe.title}
                             className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
                         />

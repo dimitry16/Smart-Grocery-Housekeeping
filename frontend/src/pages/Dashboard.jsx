@@ -13,10 +13,11 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Badge } from "@/components/ui/badge"
-import { Card, CardAction, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { daysUntilExpiry, ExpiryBadge, rowColor } from "@/lib/expiry";
 import { FOOD_ITEMS_URL } from "@/lib/api";
+import { useAuth } from "@/lib/useAuth"
+import { apiFetch } from "@/lib/api"
 
 const mockRecipes = [
     { id: 1, title: "Salmon Alfredo", image: null, category: "Dinner" },
@@ -67,14 +68,12 @@ function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const { token } = useAuth();
+
     useEffect(() => {
         async function fetchFoodItems() {
             try {
-                const response = await fetch(FOOD_ITEMS_URL);
-                if (!response.ok) {
-                    throw new Error(`Error ${response.status}: ${response.statusText}`);
-                }
-                const data = await response.json();
+                const data = await apiFetch(FOOD_ITEMS_URL, token);
                 setFoodItems(data);
             } catch (err) {
                 setError(err.message);
@@ -84,7 +83,7 @@ function Dashboard() {
         }
 
         fetchFoodItems();
-    }, []);
+    }, [token]);
 
     if (loading) {
         return (
@@ -101,13 +100,12 @@ function Dashboard() {
             </div>
         );
     }
-
-    const expiringSoon = foodItems.filter(item => {
+    const expiringSoon = foodItems['data'].filter(item => {
         const days = daysUntilExpiry(item.expiration_date);
         return days !== null && days <= 3;
     });
 
-    const currentItems = foodItems.filter(item => {
+    const currentItems = foodItems['data'].filter(item => {
         const days = daysUntilExpiry(item.expiration_date);
         return days === null || days > 3;
     });
@@ -123,7 +121,7 @@ function Dashboard() {
                         <h2 className="text-2xl font-semibold text-gray-900">Expiring Soon</h2>
                         <p className="text-sm text-red-500">Expiring within 3 days or already expired</p>
                     </div>
-                    <Link to="/current_items">
+                    <Link to="/all_items">
                         <Button variant="outline" size="sm">View All</Button>
                     </Link>
                 </div>
@@ -138,7 +136,7 @@ function Dashboard() {
                         <Link to="/additem">
                             <Button variant="outline" size="sm">Add Item</Button>
                         </Link>
-                        <Link to="/current_items">
+                        <Link to="/all_items">
                             <Button variant="outline" size="sm">View All</Button>
                         </Link>
                     </div>
@@ -164,9 +162,6 @@ function Dashboard() {
                                 className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
                             />
                             <CardHeader>
-                                <CardAction>
-                                    <Badge variant="secondary">{recipe.category}</Badge>
-                                </CardAction>
                                 <CardTitle className="text-sm">{recipe.title}</CardTitle>
                             </CardHeader>
                         </Card>
