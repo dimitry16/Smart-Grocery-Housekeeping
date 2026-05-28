@@ -61,7 +61,11 @@ export function useAuth() {
 
         if (!res.ok) {
             const err = await res.json().catch(() => ({}));
-            throw new Error(err.detail ?? `Registration failed (${res.status})`);
+            const detail = err.detail;
+            const message = Array.isArray(detail)
+                ? detail.map((e) => e.msg).join(", ")
+                : detail ?? `Registration failed (${res.status})`;
+            throw new Error(message);
         }
 
         return res.json(); // { id, name, email_address }

@@ -23,15 +23,18 @@ function SignUpForm() {
     // Check if both password fields have been entered and don't match
     const passwordMismatch = confirmPassword.length > 0 && password !== confirmPassword
 
+    // Check password length
+    const passwordTooShort = password.length > 0 && password.length < 8
+
     // If passwords don't match, stop form submission
     const handleSubmit = async (event) => {
         event.preventDefault()
-        if (passwordMismatch) {
+        if (passwordMismatch || passwordTooShort) {
             return
         }
         try {
             console
-            await register({ name, email, password });
+            await register({name: name || null, email, password });
             await login({ email, password });
             navigate("/");
         } catch (err) {
@@ -75,8 +78,12 @@ function SignUpForm() {
                         type="password"
                         value={password}
                         onChange={(event) => setPassword(event.target.value)}
+                        minLength={8}
                         required
                     />
+                    {passwordTooShort && (
+                        <p className="text-xs text-red-500">Password must be at least 8 characters</p>
+                    )}
                 </div>
                 <div className="grid gap-2">
                     <Label className="text-gray-700" htmlFor="confirm-password">
@@ -95,7 +102,7 @@ function SignUpForm() {
                     )}
                 </div>
                 <div className="flex justify-center">
-                <Button type="submit" className="text-md font-bold flex-col gap-2 bg-blue-100 rounded-full px-6 py-5" disabled={passwordMismatch}>Create Account</Button>
+                <Button type="submit" className="text-md font-bold flex-col gap-2 bg-blue-100 rounded-full px-6 py-5" disabled={passwordMismatch || passwordTooShort}>Create Account</Button>
                 </div>
             </div>
         </form>
