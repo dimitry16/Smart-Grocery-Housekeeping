@@ -62,7 +62,9 @@ function Recipes() {
 
     async function handleSaveRecipe(recipe) {
         try {
-            await apiFetch(RECIPES_URL, token, {
+            // RECIPES_URL points to /get-recipe-suggestions. We remove it to target the POST endpoint.
+            const SAVE_RECIPE_URL = RECIPES_URL.replace("/get-recipe-suggestions", "");
+            await apiFetch(SAVE_RECIPE_URL, token, {
                 method: "POST",
                 body: JSON.stringify(recipe),
             });
@@ -77,7 +79,7 @@ function Recipes() {
             <h1 className="text-center text-4xl font-semibold text-gray-900">Recipes</h1>
             {/* Responsive grid layout */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {recipes.map((recipe) => (
+                {recipes.map((recipe, index) => (
                     // Display a card for each recipe
                     // Each card includes an image, header, title, and footer
                     <Card key={recipe.title || index} className="relative mx-auto w-full pt-0">
@@ -85,13 +87,19 @@ function Recipes() {
                         <img
                             src={recipe.image_url ?? "https://placehold.co/640x360"}
                             alt={recipe.title}
-                            className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
+                            className="relative z-20 aspect-video w-full object-cover"
                         />
                         <CardHeader>
                             <CardTitle>{recipe.title}</CardTitle>
                         </CardHeader>
                         <CardFooter className="flex justify-between bg-neutral-200">
-                            <Button type="submit" variant="outline" className="bg-white text-base md:text-sm">View Recipe</Button>
+                            <Button 
+                                type="button" 
+                                variant="outline" 
+                                className="bg-white 
+                                text-base md:text-sm"
+                                onClick={() => window.open(recipe.source_url, "_blank")}
+                                >View Recipe</Button>
                             <Button 
                                 type="button" 
                                 onClick={() => handleSaveRecipe(recipe)}
