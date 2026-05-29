@@ -74,29 +74,22 @@ async def unused_items(
     db: Annotated[AsyncSession, Depends(get_db)],
     limit: int = Query(default=10, ge=1, le=50),
 ):
-    """Current food items that have been in inventory the longest (no expiration date or furthest from being added)."""
+    """Current food items that have been in inventory the longest."""
     result = await db.execute(
         select(
             FoodItemModel.name,
-            FoodItemModel.expiration_date,
+            FoodItemModel.created_at,
         )
         .where(FoodItemModel.user_id == current_user.id)
-        .order_by(FoodItemModel.expiration_date.asc().nullslast())
+        .order_by(FoodItemModel.created_at.asc())
         .limit(limit)
     )
     rows = result.all()
 
-    today = datetime.date.today()
+    now = datetime.datetime.now(datetime.timezone.utc)
     items = []
     for row in rows:
-        if row[1] is not None:
-            days_in_inventory = (row[1] - today).days
-            if days_in_inventory < 0:
-                days_in_inventory = abs(days_in_inventory)
-            else:
-                days_in_inventory = 0
-        else:
-            days_in_inventory = 0
+        days_in_inventory = (now - row[1]).days
         items.append(ReportItem(name=row[0], count=days_in_inventory, unit="days"))
 
     return items

@@ -7,15 +7,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.services import CurrentUser
 from app.database.models import FoodItem as FoodItemModel
+from app.database.models import UsageLog
 from app.database.sqlconnector import get_db
 from app.food_items.schema import (
     FoodItemCreate,
     FoodItemResponse,
     FoodItemsPublic,
     FoodItemUpdate,
+    LogUsageRequest,
 )
 
 from . import services
+
 
 router = APIRouter()
 
@@ -196,6 +199,37 @@ async def delete_food_item(
             status_code=status.HTTP_403_FORBIDDEN, detail="User not authorized."
         )
 
+    await db.delete(food_item)
+    await db.commit()
+
+    return None
+
+
+@router.post("/{food_item_id}/log-usage", status_code=status.HTTP_204_NO_CONTENT)
+async def log_usage(
+    current_user: CurrentUser,
+    food_item_id: UUID,
+    body: LogUsageRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    """Log a food item as used or wasted, then remove it from inventory."""
+    food_item = await services.get_food_item(food_item_id=food_item_id, db=db)
+    if not food_item:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Food item not found."
+        )
+    if food_item.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="User not authorized."
+        )
+
+    usage_log = UsageLog(
+        user_id=current_user.id,
+        food_item_name=food_item.name,
+        category=food_item.category,
+        action=body.action.value,
+    )
+    db.add(usage_log)
     await db.delete(food_item)
     await db.commit()
 

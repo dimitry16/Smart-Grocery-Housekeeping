@@ -1,4 +1,4 @@
-// CurrentItems.jsx — fetch all, edit (PATCH), delete (DELETE) with expiration tracking
+// AllItems.jsx — fetch all, edit (PATCH), delete (DELETE) with expiration tracking
 // Name: Zilin Xu
 // Date: 4/22/2026
 // Last updated: 5/5/2026
@@ -27,7 +27,6 @@ function EditModal({ item, onClose, onSave }) {
   const [error, setError] = useState(null);
 
   const { token } = useAuth();
-
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -61,7 +60,7 @@ function EditModal({ item, onClose, onSave }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6 space-y-4">
         <h2 className="text-xl font-semibold text-gray-900">Edit Item</h2>
 
@@ -142,19 +141,40 @@ function EditModal({ item, onClose, onSave }) {
   );
 }
 
-function DeleteConfirmModal({ item, onClose, onConfirm, deleting }) {
+function RemoveItemModal({ item, onClose, onRemove, removing }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-sm p-6 space-y-4">
-        <h2 className="text-xl font-semibold text-gray-900">Delete Item</h2>
+        <h2 className="text-xl font-semibold text-gray-900">Remove Item</h2>
         <p className="text-sm text-gray-600">
-          Are you sure you want to delete <span className="font-medium">{item.name}</span>? This cannot be undone.
+          How would you like to remove <span className="font-medium">{item.name}</span>?
         </p>
-        <div className="flex gap-3">
-          <Button onClick={onConfirm} disabled={deleting} className="bg-red-500 hover:bg-red-600 text-white">
-            {deleting ? "Deleting..." : "Delete"}
+        <div className="flex flex-col gap-2">
+          <Button
+            onClick={() => onRemove("used")}
+            disabled={removing}
+            className="bg-emerald-500 hover:bg-emerald-600 text-white w-full"
+          >
+            {removing === "used" ? "Logging..." : "Mark as Used"}
           </Button>
-          <Button variant="outline" onClick={onClose} disabled={deleting}>Cancel</Button>
+          <Button
+            onClick={() => onRemove("wasted")}
+            disabled={removing}
+            className="bg-orange-500 hover:bg-orange-600 text-white w-full"
+          >
+            {removing === "wasted" ? "Logging..." : "Mark as Wasted"}
+          </Button>
+          <Button
+            onClick={() => onRemove("delete")}
+            disabled={removing}
+            variant="outline"
+            className="text-red-500 border-red-300 hover:bg-red-50 w-full"
+          >
+            {removing === "delete" ? "Deleting..." : "Just Delete"}
+          </Button>
+          <Button variant="outline" onClick={onClose} disabled={removing} className="w-full">
+            Cancel
+          </Button>
         </div>
       </div>
     </div>
@@ -166,8 +186,8 @@ function AllItems() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
-  const [deletingItem, setDeletingItem] = useState(null);
-  const [deleting, setDeleting] = useState(false);
+  const [removingItem, setRemovingItem] = useState(null);
+  const [removing, setRemoving] = useState(false);
 
   const { token } = useAuth();
 
@@ -190,16 +210,23 @@ function AllItems() {
     setEditingItem(null);
   }
 
-  async function handleDelete() {
-    setDeleting(true);
+  async function handleRemove(action) {
+    setRemoving(action);
     try {
-      await apiFetch(`${FOOD_ITEMS_URL}/${deletingItem.id}`, token, { method: "DELETE" });
-      setItems((prev) => prev.filter((i) => i.id !== deletingItem.id));
-      setDeletingItem(null);
+      if (action === "delete") {
+        await apiFetch(`${FOOD_ITEMS_URL}/${removingItem.id}`, token, { method: "DELETE" });
+      } else {
+        await apiFetch(`${FOOD_ITEMS_URL}/${removingItem.id}/log-usage`, token, {
+          method: "POST",
+          body: JSON.stringify({ action }),
+        });
+      }
+      setItems((prev) => prev.filter((i) => i.id !== removingItem.id));
+      setRemovingItem(null);
     } catch (err) {
       setError(err.message);
     } finally {
-      setDeleting(false);
+      setRemoving(false);
     }
   }
 
@@ -241,9 +268,9 @@ function AllItems() {
                       <Button
                         size="sm" variant="outline"
                         className="text-red-500 border-red-300 hover:bg-red-50"
-                        onClick={() => setDeletingItem(item)}
+                        onClick={() => setRemovingItem(item)}
                       >
-                        Delete
+                        Remove
                       </Button>
                     </div>
                   </td>
@@ -257,12 +284,12 @@ function AllItems() {
       {editingItem && (
         <EditModal item={editingItem} onClose={() => setEditingItem(null)} onSave={handleSave} />
       )}
-      {deletingItem && (
-        <DeleteConfirmModal
-          item={deletingItem}
-          onClose={() => setDeletingItem(null)}
-          onConfirm={handleDelete}
-          deleting={deleting}
+      {removingItem && (
+        <RemoveItemModal
+          item={removingItem}
+          onClose={() => setRemovingItem(null)}
+          onRemove={handleRemove}
+          removing={removing}
         />
       )}
     </div>
