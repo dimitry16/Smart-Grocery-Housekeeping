@@ -9,13 +9,15 @@
 
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Utensils, ClockAlert, Trash2 } from "lucide-react"
 import {
     REPORTS_FREQUENTLY_USED_URL,
     REPORTS_FREQUENTLY_WASTED_URL,
     REPORTS_UNUSED_URL,
 } from "@/lib/api"
+import { useAuth } from "@/lib/useAuth"
+import { apiFetch } from "@/lib/api"
 
 // Displays a list of the items within each report
 function ItemList({items}) {
@@ -39,6 +41,7 @@ function Reports() {
     const [spoiledItems, setSpoiledItems] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const { token } = useAuth();
 
     useEffect(() => {
         async function fetchReports() {
@@ -46,18 +49,14 @@ function Reports() {
             setError(null)
             try {
                 const [usedRes, unusedRes, wastedRes] = await Promise.all([
-                    fetch(REPORTS_FREQUENTLY_USED_URL),
-                    fetch(REPORTS_UNUSED_URL),
-                    fetch(REPORTS_FREQUENTLY_WASTED_URL),
+                    apiFetch(REPORTS_FREQUENTLY_USED_URL, token),
+                    apiFetch(REPORTS_UNUSED_URL, token),
+                    apiFetch(REPORTS_FREQUENTLY_WASTED_URL, token),
                 ])
 
-                if (!usedRes.ok || !unusedRes.ok || !wastedRes.ok) {
-                    throw new Error("Failed to load report data")
-                }
-
-                setUsedItems(await usedRes.json())
-                setUnusedItems(await unusedRes.json())
-                setSpoiledItems(await wastedRes.json())
+                setUsedItems(usedRes)
+                setUnusedItems(unusedRes)
+                setSpoiledItems(wastedRes)
             } catch (err) {
                 setError(err.message)
             } finally {
@@ -143,9 +142,6 @@ function Reports() {
                                 <p className="text-sm text-muted-foreground">No data yet</p>
                             )}
                         </CardContent>
-                        <CardFooter className="bg-neutral-200">
-                            <Button className="w-full">View Details</Button>
-                        </CardFooter>
                     </Card>
                 ))}
             </div>
