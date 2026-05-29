@@ -20,7 +20,7 @@ export async function apiFetch(url, token, options = {}) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.detail ?? `Request failed (${res.status})`);
     }
-    if (options["method"] == "DELETE")
+    if (options["method"] == "DELETE" || res.status == 204)
         return {}
 
     return res.json();
