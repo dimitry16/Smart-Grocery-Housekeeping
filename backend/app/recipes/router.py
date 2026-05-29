@@ -16,7 +16,6 @@ from app.auth.services import CurrentUser
 
 from app.database.models import FoodItem as FoodItemModel
 
-# Ensure the SavedRecipe model matches your definition in app.database.models
 from app.database.models import Recipe as RecipeModel
 
 from app.external_api_services.recipe_api import get_recipes_from_ingredients
@@ -66,7 +65,7 @@ async def save_recipe(
     result = await db.execute(
         select(RecipeModel).where(
             RecipeModel.user_id == current_user.id,
-            RecipeModel.recipe_id == recipe_data.id,
+            RecipeModel.title == recipe_data.title,
         )
     )
     if result.scalar_one_or_none():
@@ -74,8 +73,17 @@ async def save_recipe(
             status_code=status.HTTP_409_CONFLICT, detail="Recipe is already saved."
         )
 
-    new_saved_recipe = RecipeModel(**recipe_data.model_dump(), user_id=current_user.id)
+    # Exclude recipe_ingredients from the DB insert to prevent SQLAlchemy crashes
+    new_saved_recipe = RecipeModel(**recipe_data.model_dump(exclude={"id", "recipe_ingredients"}), user_id=current_user.id)
     db.add(new_saved_recipe)
     await db.commit()
     await db.refresh(new_saved_recipe)
-    return new_saved_recipe
+
+    # Return the ingredients manually so the API caller still receives them
+    return {
+        "title": new_saved_recipe.title,
+        "description": new_saved_recipe.description,
+        "image_url": new_saved_recipe.image_url,
+        "source_url": new_saved_recipe.source_url,
+        "recipe_ingredients": recipe_data.recipe_ingredients,
+    }

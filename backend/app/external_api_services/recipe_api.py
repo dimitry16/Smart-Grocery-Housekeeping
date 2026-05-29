@@ -40,6 +40,8 @@ async def get_recipes_from_ingredients(ingredients):
             response = await client.get(RECIPES_URL, params=params)
             if response.status_code == 200:
                 recipes = response.json()
+            else:
+                return []
         except Exception:
             return []
 

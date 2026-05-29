@@ -82,6 +82,9 @@ class Recipe(Base):
     id: Mapped[UUID] = mapped_column(
         types.Uuid, primary_key=True, server_default=text("gen_random_uuid()")
     )
+    user_id: Mapped[UUID] = mapped_column(
+        types.Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
     title: Mapped[str] = mapped_column(String(50), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(String(2000))
     image_url: Mapped[Optional[str]] = mapped_column(Text)
