@@ -11,11 +11,16 @@
 // URL: https://tailwindcss.com/docs/responsive-design
 // URL: https://dev.to/sheraz4194/mastering-tailwind-css-overcome-styling-conflicts-with-tailwind-merge-and-clsx-1dol 
 
+// Name: Krystal Lu
+// Updated: 05/29/2026
+// Show "Log Out" if user is logged in, otherwise show "Log in"
+
 import { NavLink } from 'react-router-dom'
 import logo from '@/assets/grocery.png'
 import { useState } from 'react'
 import clsx from 'clsx'
 import Logout from './Logout'
+import { useAuth } from '@/lib/useAuth'
 
 
 const navItems = [
@@ -27,12 +32,17 @@ const navItems = [
     { label: 'Recipes', path: '/recipes' },
     { label: 'Saved Recipes', path: '/savedrecipes'},
     { label: 'Reports', path: '/reports' },
-    { label: 'Log In', path: '/login' },
 ]
 
+
 function Navbar() {
+    const { isAuthenticated } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const handleNavClick = () => setIsOpen(false);
+
+    const visibleNavItems = [
+        ...(!isAuthenticated() ? [{label: 'Log in', path: '/login' }] : navItems),
+    ];
 
     return (
         <>
@@ -64,7 +74,7 @@ function Navbar() {
                 <img src={logo} alt="logo" className="w-20 md:w-24 mb-6 md:mb-8 ml-8" />
                 
                 <div className="flex flex-col gap-1 flex-1 overflow-y-auto">
-                    {navItems.map((item) => (
+                    {visibleNavItems.map((item) => (
                         // Highlight current page name
                         <NavLink
                             key={item.path}
@@ -82,7 +92,7 @@ function Navbar() {
                         </NavLink>
                     ))}
                 </div>
-                <Logout />
+                { isAuthenticated() && <Logout /> }
                 <div className="py-3 border-t text-xs text-muted-foreground">
                     <a href="https://www.flaticon.com/free-icon/grocery_1261052?term=groceries&page=1&position=2&origin=tag&related_id=1261052" target="_blank" rel="noopener noreferrer" className="hover:text-gray-600 pb-20 block">
                         Groceries icon created by monkik - Flaticon
