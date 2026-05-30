@@ -1,0 +1,167 @@
+[33mcommit 9fd8b7980cc1c5e17c41865e1fbfe6b2d7439552[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32myasserBranch[m[33m, [m[1;31morigin/yasserBranch[m[33m)[m
+Author: Yasser Hernandez <dimitry202@gmail.com>
+Date:   Fri May 29 19:56:21 2026 -0800
+
+    ruff format
+
+[33mcommit b5541b3c790dc9107c55c3111396d14c063daaac[m
+Author: Yasser Hernandez <dimitry202@gmail.com>
+Date:   Fri May 29 19:55:52 2026 -0800
+
+    removed unused impot
+
+[33mcommit bf6d886d86a2e22e4f3592a67cfbbd37f75617cc[m
+Author: Yasser Hernandez <dimitry202@gmail.com>
+Date:   Fri May 29 19:51:02 2026 -0800
+
+    updated normalized_recipes to account when field is None type
+
+[33mcommit d189f0e544ae1927243f07ceafe727f6dbe808f6[m
+Merge: 8747590 67d6b0c
+Author: Yasser Hernandez <dimitry202@gmail.com>
+Date:   Fri May 29 18:02:51 2026 -0800
+
+    removed unused import
+
+[33mcommit 870e9313ec3a3bdae314457277de82423708dacf[m
+Author: Yasser Hernandez <dimitry202@gmail.com>
+Date:   Fri May 29 17:51:55 2026 -0800
+
+    removed unused import
+
+[33mcommit 67d6b0c7dc138fbab49d1405497a808071fc9380[m
+Merge: 3002231 dd3aa30
+Author: Yasser Hernandez <93357375+dimitry16@users.noreply.github.com>
+Date:   Fri May 29 17:46:15 2026 -0800
+
+    Merge branch 'main' into yasserBranch
+
+[33mcommit 17ff8ac03fcba1f718816d6176cff557061ecac2[m
+Author: Yasser Hernandez <dimitry202@gmail.com>
+Date:   Fri May 29 17:35:23 2026 -0800
+
+    ruff format
+
+[33mcommit 68798de35b1fbd5ad1ca7b552a3320620caa90c0[m
+Author: Yasser Hernandez <dimitry202@gmail.com>
+Date:   Fri May 29 16:27:31 2026 -0800
+
+    udpated database to include recipe.userid
+
+[33mcommit 76e37dc9bc2883970b5a8ce582a756c0c069d801[m
+Author: Yasser Hernandez <dimitry202@gmail.com>
+Date:   Thu May 28 17:37:04 2026 -0800
+
+    updated recipe model to inlcude userid, added logic for saving recipes in recipes frontend
+
+[33mcommit 462747ed42631d90a66688480d067b6fc941153c[m
+Author: zilinxuOSU <xuzili@oregonstate.edu>
+Date:   Thu May 28 10:08:32 2026 -0700
+
+    Add files via upload
+
+[33mcommit 15e1d13b8d27bcd4c4fc6936e543ed0a12daf505[m
+Author: zilinxuOSU <xuzili@oregonstate.edu>
+Date:   Thu May 28 10:06:39 2026 -0700
+
+    Delete backend directory
+
+[33mcommit d725d641b308a230e0eb41702c750120afbab78a[m
+Author: zilinxuOSU <xuzili@oregonstate.edu>
+Date:   Wed May 27 09:58:04 2026 -0700
+
+    Add files via upload
+
+[33mcommit f0f3fba694d1134baed231bebf118e8c04fc0b8e[m
+Author: zilinxuOSU <xuzili@oregonstate.edu>
+Date:   Wed May 27 09:54:39 2026 -0700
+
+    Delete backend directory
+
+[33mcommit 8d703a20350b9bf1de79276c2447be66fcc5805f[m[33m ([m[1;31morigin/delete-dupe-alembic-ver[m[33m)[m
+Author: klu <52183673+klu04@users.noreply.github.com>
+Date:   Tue May 26 12:27:52 2026 -0700
+
+    Delete duplicate alembic version
+
+[33mcommit 2216c5a111b0d29f5661f2e546cb34b5c29f70d9[m
+Author: klu <52183673+klu04@users.noreply.github.com>
+Date:   Tue May 26 12:24:29 2026 -0700
+
+    Delete duplicate alembic version
+
+[33mcommit 72dfcbba26d6b782425889f56378e50f0735c972[m[33m ([m[1;31morigin/zilin3[m[33m)[m
+Merge: 171b6b7 aa83634
+Author: zilinxuOSU <xuzili@oregonstate.edu>
+Date:   Sun May 24 20:23:43 2026 -0700
+
+    Merge branch 'main' into zilin3
+
+[33mcommit 5b6b28efd93c8c9e5bb1a183021b9685698486f8[m
+Author: zilinxuOSU <xuzili@oregonstate.edu>
+Date:   Sun May 24 20:19:05 2026 -0700
+
+    Add files via upload
+
+[33mcommit f229cde05b62ad20dffd01429571c425ef432d9e[m[33m ([m[1;31morigin/usage-log-db-refactor[m[33m)[m
+Author: klu <52183673+klu04@users.noreply.github.com>
+Date:   Sun May 24 19:40:05 2026 -0700
+
+    fix formatting
+
+[33mcommit ecbee381b54f7e5222a18d92fba9da83af3cf860[m
+Author: klu <52183673+klu04@users.noreply.github.com>
+Date:   Sun May 24 19:37:50 2026 -0700
+
+    Add missing Usage Logs table
+
+[33mcommit c0611acea5fdd7f89b6230e1d6406dc711f6e74a[m
+Author: Yasser Hernandez <dimitry202@gmail.com>
+Date:   Sat May 23 08:56:03 2026 -0800
+
+    change vision_router and recipe_router to just router, remove table craeation from sqlconnector
+
+[33mcommit 6ac0f90ae5131dd879e09641f9c749c569e548fd[m
+Author: klu <52183673+klu04@users.noreply.github.com>
+Date:   Fri May 8 21:07:52 2026 -0700
+
+    Deleted old alembic revision file
+
+[33mcommit 8606e0d125bdb7706a3d11d17ce766214cbb815e[m
+Author: klu <52183673+klu04@users.noreply.github.com>
+Date:   Thu May 7 18:17:57 2026 -0700
+
+    Fix linting issues
+
+[33mcommit c1545d254ba8008494749103114bc9524a58908b[m
+Author: klu <52183673+klu04@users.noreply.github.com>
+Date:   Tue May 5 19:45:26 2026 -0700
+
+    Update models.py
+    - Add String(255) to email_address of User as they have a max length of 254
+    - Change some class and variable names from plural tense to singular tense for naming consistency
+    - Change typing for quantity from Numeric to Decimal to match Python typing
+
+[33mcommit 80d86a9808310ae87a5e858f715bbe6ed6815b87[m
+Author: klu <52183673+klu04@users.noreply.github.com>
+Date:   Tue May 5 16:02:47 2026 -0700
+
+    Add new alembic migrations - unique constraints
+
+[33mcommit b68330f5d27dff3e499c22bbcef8238dd040a433[m
+Author: klu <52183673+klu04@users.noreply.github.com>
+Date:   Mon May 4 15:59:29 2026 -0700
+
+    Add unique constraint between 'user_id' and 'food_item_id' for UserFoodItems table
+
+[33mcommit 3e562ebe191bad74a386359850e169d7d7c87203[m
+Author: klu <52183673+klu04@users.noreply.github.com>
+Date:   Thu Apr 30 17:20:14 2026 -0700
+
+    Add initial migration for alembic
+
+[33mcommit 0e42edad1a0d2104456fd39141f90c7e22d83576[m
+Author: klu <52183673+klu04@users.noreply.github.com>
+Date:   Wed Apr 29 18:45:23 2026 -0700
+
+    Add Alembic for database migration
