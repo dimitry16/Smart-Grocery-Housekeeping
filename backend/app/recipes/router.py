@@ -61,7 +61,7 @@ async def save_recipe(
 ):
     """Saves a recipe to user's recipes."""
 
-    # Check if the recipe is already saved by the user
+    # Check if the recipe was already saved
     result = await db.execute(
         select(RecipeModel).where(
             RecipeModel.user_id == current_user.id,
@@ -73,13 +73,13 @@ async def save_recipe(
             status_code=status.HTTP_409_CONFLICT, detail="Recipe is already saved."
         )
 
-    # Exclude recipe_ingredients from the DB insert to prevent SQLAlchemy crashes
+    # Exclude recipe_ingredients from the DB
     new_saved_recipe = RecipeModel(**recipe_data.model_dump(exclude={"id", "recipe_ingredients"}), user_id=current_user.id)
     db.add(new_saved_recipe)
     await db.commit()
     await db.refresh(new_saved_recipe)
 
-    # Return the ingredients manually so the API caller still receives them
+    # Return recipe with ingredients manually added
     return {
         "title": new_saved_recipe.title,
         "description": new_saved_recipe.description,
@@ -87,3 +87,30 @@ async def save_recipe(
         "source_url": new_saved_recipe.source_url,
         "recipe_ingredients": recipe_data.recipe_ingredients,
     }
+
+
+@router.get("", response_model=list[RecipeResponse])
+async def get_saved_recipes(
+    current_user: CurrentUser,
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    """Gets all saved recipes for the current user."""
+
+    result = await db.execute(
+        select(RecipeModel).where(RecipeModel.user_id == current_user.id)
+    )
+    saved_recipes = result.scalars().all()
+
+    # dictionary of recipes.
+    result = []
+
+    for recipe in saved_recipes:
+        result.append({
+            "title": recipe.title,
+            "description": recipe.description,
+            "image_url": recipe.image_url,
+            "source_url": recipe.source_url,
+            "recipe_ingredients": []
+        })
+
+    return result

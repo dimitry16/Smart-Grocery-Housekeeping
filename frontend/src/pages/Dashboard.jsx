@@ -148,7 +148,7 @@ function Dashboard() {
             <div className="rounded-lg border bg-white">
                 <div className="p-4 border-b bg-olive-200 flex items-center justify-between">
                     <h2 className="text-2xl font-semibold text-gray-900">Recipes</h2>
-                    <Link to="/recipes">
+                    <Link to="/savedrecipes">
                         <Button variant="outline" size="sm">View All</Button>
                     </Link>
                 </div>
