@@ -1,8 +1,8 @@
-"""Updated recipe table
+"""increase title size in recipes
 
-Revision ID: 4d223ddbae9d
-Revises: 58e7afc45092
-Create Date: 2026-05-29 20:49:17.402354
+Revision ID: 018dbdd6bbd3
+Revises: cbdd7eeab229
+Create Date: 2026-05-29 22:34:18.893819
 
 """
 
@@ -13,8 +13,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "4d223ddbae9d"
-down_revision: Union[str, Sequence[str], None] = "58e7afc45092"
+revision: str = "018dbdd6bbd3"
+down_revision: Union[str, Sequence[str], None] = "cbdd7eeab229"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

@@ -1,8 +1,8 @@
 """add user_id to recipes
 
-Revision ID: 51ab6a0e2152
-Revises: ae54dbf86651
-Create Date: 2026-05-29 16:19:12.308152
+Revision ID: cbdd7eeab229
+Revises: b7e2a1f3d890
+Create Date: 2026-05-29 19:37:53.065865
 
 """
 
@@ -13,8 +13,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "51ab6a0e2152"
-down_revision: Union[str, Sequence[str], None] = "ae54dbf86651"
+revision: str = "cbdd7eeab229"
+down_revision: Union[str, Sequence[str], None] = "b7e2a1f3d890"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
