@@ -28,7 +28,7 @@ async def get_recipes_from_ingredients(ingredients):
 
     params = {
         "ingredients": ingredient_list,
-        "number": 2,
+        "number": 1,
         "ranking": 1,
         "ignorePantry": False,
         "apiKey": settings.SPOONACULAR_API_KEY,
@@ -53,7 +53,7 @@ async def get_recipes_from_ingredients(ingredients):
                 "title": item["title"],
                 "description": recipe_info.get("summary", "") if recipe_info else "",
                 "image_url": item.get("image"),
-                "source_url": recipe_info.get("sourceUrl"),
+                "source_url": recipe_info.get("sourceUrl") if recipe_info else "",
                 "recipe_ingredients": [
                     i["name"] for i in item.get("usedIngredients", [])
                 ],
