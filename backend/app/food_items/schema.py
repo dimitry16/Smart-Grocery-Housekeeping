@@ -1,8 +1,18 @@
 import datetime
 from decimal import Decimal
+from enum import Enum
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
+
+
+class UsageAction(str, Enum):
+    used = "used"
+    wasted = "wasted"
+
+
+class LogUsageRequest(BaseModel):
+    action: UsageAction
 
 
 class FoodItemBase(BaseModel):

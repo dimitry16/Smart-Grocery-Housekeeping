@@ -52,6 +52,9 @@ class FoodItem(Base):
     )
     unit: Mapped[Optional[str]] = mapped_column(String(30))
     expiration_date: Mapped[Optional[datetime.date]] = mapped_column(sqlalchemy.Date)
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), server_default=text("now()"), nullable=False
+    )
 
     # Ensure uniqueness so no same barcode is added twice.
     __table_args__ = (UniqueConstraint("user_id", "barcode", name="user_barcode"),)

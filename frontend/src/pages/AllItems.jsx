@@ -1,7 +1,8 @@
-// CurrentItems.jsx — fetch all, edit (PATCH), delete (DELETE) with expiration tracking
+// AllItems.jsx — fetch all, edit (PATCH), delete (DELETE) with expiration tracking
 // Name: Zilin Xu
 // Date: 4/22/2026
 // Last updated: 5/5/2026
+// Responsive design: Paula Tica on 5/27/2026
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -26,7 +27,6 @@ function EditModal({ item, onClose, onSave }) {
   const [error, setError] = useState(null);
 
   const { token } = useAuth();
-
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -141,19 +141,40 @@ function EditModal({ item, onClose, onSave }) {
   );
 }
 
-function DeleteConfirmModal({ item, onClose, onConfirm, deleting }) {
+function RemoveItemModal({ item, onClose, onRemove, removing }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-sm p-6 space-y-4">
-        <h2 className="text-xl font-semibold text-gray-900">Delete Item</h2>
+        <h2 className="text-xl font-semibold text-gray-900">Remove Item</h2>
         <p className="text-sm text-gray-600">
-          Are you sure you want to delete <span className="font-medium">{item.name}</span>? This cannot be undone.
+          How would you like to remove <span className="font-medium">{item.name}</span>?
         </p>
-        <div className="flex gap-3">
-          <Button onClick={onConfirm} disabled={deleting} className="bg-red-500 hover:bg-red-600 text-white">
-            {deleting ? "Deleting..." : "Delete"}
+        <div className="flex flex-col gap-2">
+          <Button
+            onClick={() => onRemove("used")}
+            disabled={removing}
+            className="bg-emerald-500 hover:bg-emerald-600 text-white w-full"
+          >
+            {removing === "used" ? "Logging..." : "Mark as Used"}
           </Button>
-          <Button variant="outline" onClick={onClose} disabled={deleting}>Cancel</Button>
+          <Button
+            onClick={() => onRemove("wasted")}
+            disabled={removing}
+            className="bg-orange-500 hover:bg-orange-600 text-white w-full"
+          >
+            {removing === "wasted" ? "Logging..." : "Mark as Wasted"}
+          </Button>
+          <Button
+            onClick={() => onRemove("delete")}
+            disabled={removing}
+            variant="outline"
+            className="text-red-500 border-red-300 hover:bg-red-50 w-full"
+          >
+            {removing === "delete" ? "Deleting..." : "Just Delete"}
+          </Button>
+          <Button variant="outline" onClick={onClose} disabled={removing} className="w-full">
+            Cancel
+          </Button>
         </div>
       </div>
     </div>
@@ -165,8 +186,8 @@ function AllItems() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
-  const [deletingItem, setDeletingItem] = useState(null);
-  const [deleting, setDeleting] = useState(false);
+  const [removingItem, setRemovingItem] = useState(null);
+  const [removing, setRemoving] = useState(false);
 
   const { token } = useAuth();
 
@@ -189,16 +210,23 @@ function AllItems() {
     setEditingItem(null);
   }
 
-  async function handleDelete() {
-    setDeleting(true);
+  async function handleRemove(action) {
+    setRemoving(action);
     try {
-      await apiFetch(`${FOOD_ITEMS_URL}/${deletingItem.id}`, token, { method: "DELETE" });
-      setItems((prev) => prev.filter((i) => i.id !== deletingItem.id));
-      setDeletingItem(null);
+      if (action === "delete") {
+        await apiFetch(`${FOOD_ITEMS_URL}/${removingItem.id}`, token, { method: "DELETE" });
+      } else {
+        await apiFetch(`${FOOD_ITEMS_URL}/${removingItem.id}/log-usage`, token, {
+          method: "POST",
+          body: JSON.stringify({ action }),
+        });
+      }
+      setItems((prev) => prev.filter((i) => i.id !== removingItem.id));
+      setRemovingItem(null);
     } catch (err) {
       setError(err.message);
     } finally {
-      setDeleting(false);
+      setRemoving(false);
     }
   }
 
@@ -206,19 +234,19 @@ function AllItems() {
   if (error) return <div className="p-6 text-center text-red-500">Failed to load items: {error}</div>;
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
-      <h1 className="text-3xl font-semibold text-gray-900">All Food Items</h1>
+    <div className="p-4 md:p-6 max-w-5xl mx-auto space-y-6">
+      <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 pl-12 md:pl-0">All Food Items</h1>
 
-      <div className="rounded-lg border bg-white">
+      <div className="rounded-lg border bg-white overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
             <tr>
-              <th className="px-4 py-3 text-left">Name</th>
-              <th className="px-4 py-3 text-left">Brand</th>
-              <th className="px-4 py-3 text-left">Category</th>
-              <th className="px-4 py-3 text-left">Barcode</th>
-              <th className="px-4 py-3 text-left">Expiration</th>
-              <th className="px-4 py-3 text-left">Actions</th>
+              <th className="px-3 py-2 md:px-4 md:py-3 text-left">Name</th>
+              <th className="px-3 py-2 md:px-4 md:py-3 text-left hidden md:table-cell">Brand</th>
+              <th className="px-3 py-2 md:px-4 md:py-3 text-left hidden sm:table-cell">Category</th>
+              <th className="px-3 py-2 md:px-4 md:py-3 text-left hidden md:table-cell">Barcode</th>
+              <th className="px-3 py-2 md:px-4 md:py-3 text-left">Expiration</th>
+              <th className="px-3 py-2 md:px-4 md:py-3 text-left">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -229,20 +257,20 @@ function AllItems() {
             ) : (
               items.map((item) => (
                 <tr key={item.id} className={`hover:brightness-95 ${rowColor(item.expiration_date)}`}>
-                  <td className="px-4 py-3 font-medium">{item.name}</td>
-                  <td className="px-4 py-3 text-gray-500">{item.brand ?? "—"}</td>
-                  <td className="px-4 py-3">{item.category ?? "—"}</td>
-                  <td className="px-4 py-3">{item.barcode ?? "—"}</td>
-                  <td className="px-4 py-3"><ExpiryBadge dateStr={item.expiration_date} /></td>
-                  <td className="px-4 py-3">
-                    <div className="flex gap-2">
+                  <td className="px-3 py-2 md:px-4 md:py-3 font-medium">{item.name}</td>
+                  <td className="px-3 py-2 md:px-4 md:py-3 text-gray-500 hidden md:table-cell">{item.brand ?? "—"}</td>
+                  <td className="px-3 py-2 md:px-4 md:py-3 hidden sm:table-cell">{item.category ?? "—"}</td>
+                  <td className="px-3 py-2 md:px-4 md:py-3 hidden md:table-cell">{item.barcode ?? "—"}</td>
+                  <td className="px-3 py-2 md:px-4 md:py-3"><ExpiryBadge dateStr={item.expiration_date} /></td>
+                  <td className="px-3 py-2 md:px-4 md:py-3">
+                    <div className="flex flex-col md:flex-row gap-1 md:gap-2">
                       <Button size="sm" variant="outline" onClick={() => setEditingItem(item)}>Edit</Button>
                       <Button
                         size="sm" variant="outline"
                         className="text-red-500 border-red-300 hover:bg-red-50"
-                        onClick={() => setDeletingItem(item)}
+                        onClick={() => setRemovingItem(item)}
                       >
-                        Delete
+                        Remove
                       </Button>
                     </div>
                   </td>
@@ -256,12 +284,12 @@ function AllItems() {
       {editingItem && (
         <EditModal item={editingItem} onClose={() => setEditingItem(null)} onSave={handleSave} />
       )}
-      {deletingItem && (
-        <DeleteConfirmModal
-          item={deletingItem}
-          onClose={() => setDeletingItem(null)}
-          onConfirm={handleDelete}
-          deleting={deleting}
+      {removingItem && (
+        <RemoveItemModal
+          item={removingItem}
+          onClose={() => setRemovingItem(null)}
+          onRemove={handleRemove}
+          removing={removing}
         />
       )}
     </div>
