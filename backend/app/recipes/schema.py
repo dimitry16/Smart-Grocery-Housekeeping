@@ -1,9 +1,8 @@
-from pydantic import BaseModel, ConfigDict, Field
-from uuid import UUID
+from pydantic import BaseModel, Field
 
 
 class RecipeCreate(BaseModel):
-    id: str | None = Field(None)  # Add this so you can lookup the recipe ID
+    id: str | None = Field(None)
     title: str | None = Field(None, max_length=50)
     description: str | None = Field(None, max_length=2000)
     image_url: str | None = Field(None)
