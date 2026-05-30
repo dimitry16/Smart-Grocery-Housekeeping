@@ -74,7 +74,10 @@ async def save_recipe(
         )
 
     # Exclude recipe_ingredients from the DB
-    new_saved_recipe = RecipeModel(**recipe_data.model_dump(exclude={"id", "recipe_ingredients"}), user_id=current_user.id)
+    new_saved_recipe = RecipeModel(
+        **recipe_data.model_dump(exclude={"id", "recipe_ingredients"}),
+        user_id=current_user.id,
+    )
     db.add(new_saved_recipe)
     await db.commit()
     await db.refresh(new_saved_recipe)
@@ -105,12 +108,14 @@ async def get_saved_recipes(
     result = []
 
     for recipe in saved_recipes:
-        result.append({
-            "title": recipe.title,
-            "description": recipe.description,
-            "image_url": recipe.image_url,
-            "source_url": recipe.source_url,
-            "recipe_ingredients": []
-        })
+        result.append(
+            {
+                "title": recipe.title,
+                "description": recipe.description,
+                "image_url": recipe.image_url,
+                "source_url": recipe.source_url,
+                "recipe_ingredients": [],
+            }
+        )
 
     return result
