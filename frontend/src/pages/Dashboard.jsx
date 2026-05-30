@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { daysUntilExpiry, ExpiryBadge, rowColor } from "@/lib/expiry";
-import { FOOD_ITEMS_URL } from "@/lib/api";
+import { FOOD_ITEMS_URL, RECIPES_URL } from "@/lib/api";
 import { useAuth } from "@/lib/useAuth"
 import { apiFetch } from "@/lib/api"
 
@@ -65,6 +65,7 @@ function PantryTable({ items }) {
 
 function Dashboard() {
     const [foodItems, setFoodItems] = useState([]);
+    const [savedRecipes, setSavedRecipes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -83,6 +84,21 @@ function Dashboard() {
         }
 
         fetchFoodItems();
+    }, [token]);
+
+    useEffect(() => {
+        async function fetchSavedRecipes() {
+            try {
+                const SAVED_RECIPES_URL = RECIPES_URL.replace("/get-recipe-suggestions", "");
+                const data = await apiFetch(SAVED_RECIPES_URL, token);
+                setSavedRecipes(Array.isArray(data) ? data : data?.recipes || []);
+            } catch (err) {
+                console.error("Failed to load saved recipes", err);
+            }
+        }
+        if (token) {
+            fetchSavedRecipes();
+        }
     }, [token]);
 
     if (loading) {
@@ -109,6 +125,9 @@ function Dashboard() {
         const days = daysUntilExpiry(item.expiration_date);
         return days === null || days > 3;
     });
+    
+    // Display saved recipes if available, otherwise fall back to the mock array
+    const displayRecipes = savedRecipes.length > 0 ? savedRecipes : mockRecipes;
 
     return (
         <div className="p-6 max-w-5xl mx-auto space-y-6">
@@ -153,13 +172,13 @@ function Dashboard() {
                     </Link>
                 </div>
                 <div className="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {mockRecipes.slice(0, 3).map((recipe) => (
-                        <Card key={recipe.id} className="relative mx-auto w-full pt-0">
+                    {displayRecipes.slice(0, 3).map((recipe, index) => (
+                        <Card key={recipe.title || recipe.id || index} className="relative mx-auto w-full pt-0">
                             <div className="absolute inset-0 z-30 aspect-video bg-black/10" />
                             <img
-                                src={recipe.image ?? "https://placehold.co/640x360"}
+                                src={recipe.image_url ?? recipe.image ?? "https://placehold.co/640x360"}
                                 alt={recipe.title}
-                                className="relative z-20 aspect-video w-full object-cover brightness-60 grayscale dark:brightness-40"
+                                className="relative z-20 aspect-video w-full object-cover"
                             />
                             <CardHeader>
                                 <CardTitle className="text-sm">{recipe.title}</CardTitle>

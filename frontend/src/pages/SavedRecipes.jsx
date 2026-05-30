@@ -32,12 +32,11 @@ function Recipes() {
     useEffect(() => {
         async function fetchSavedRecipes() {
             try {
-                // RECIPES_URL points to /get-recipe-suggestions. We remove it to target the base /v1/recipes GET endpoint.
                 const SAVED_RECIPES_URL = RECIPES_URL.replace("/get-recipe-suggestions", "");
                 const data = await apiFetch(SAVED_RECIPES_URL, token);
                 
-                // Set recipes, falling back to an empty array if undefined
-                setRecipes(Array.isArray(data) ? data : data.recipes || []);
+                // Set recipes, othewise defaults to empty array 
+                setRecipes(Array.isArray(data) ? data : data?.recipes || []);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -65,8 +64,7 @@ function Recipes() {
                     <p className="text-gray-500 col-span-full text-center py-10">You haven't saved any recipes yet.</p>
                 ) : (
                     recipes.map((recipe, index) => (
-                    // Display a card for each recipe
-                    // Each card includes an image, header, title, and footer
+                    // card for each recipe
                     <Card key={recipe.title || index} className="relative mx-auto w-full pt-0">
                         <div className="absolute inset-0 z-30 aspect-video bg-black/10" />
                         <img
