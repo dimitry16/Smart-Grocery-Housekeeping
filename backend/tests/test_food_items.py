@@ -27,7 +27,6 @@ async def test_create_food_item_success(client: AsyncClient):
             "brand": "Horizon Organic",
             "barcode": "742365008412",
             "category": "Dairy",
-            "image_url": "https://images.example.com/products/horizon-whole-milk.jpg",
             "quantity": 1.00,
             "unit": "gallon",
             "expiration_date": "2026-05-20",
@@ -40,10 +39,6 @@ async def test_create_food_item_success(client: AsyncClient):
     assert content["brand"] == "Horizon Organic"
     assert content["barcode"] == "742365008412"
     assert content["category"] == "Dairy"
-    assert (
-        content["image_url"]
-        == "https://images.example.com/products/horizon-whole-milk.jpg"
-    )
     assert Decimal(content["quantity"]) == Decimal("1.00")
     assert content["unit"] == "gallon"
     assert content["expiration_date"] == "2026-05-20"
@@ -81,7 +76,6 @@ async def test_create_food_item_duplicate_barcode(client: AsyncClient):
             "brand": "Horizon Organic",
             "barcode": "742365008412",
             "category": "Dairy",
-            "image_url": "https://images.example.com/products/horizon-whole-milk.jpg",
             "quantity": 1.00,
             "unit": "gallon",
             "expiration_date": "2026-05-20",
@@ -100,7 +94,6 @@ async def test_create_food_item_duplicate_barcode(client: AsyncClient):
             "brand": "Horizon Organic",
             "barcode": "742365008412",
             "category": "Dairy",
-            "image_url": "https://images.example.com/products/horizon-whole-milk.jpg",
             "quantity": 1.00,
             "unit": "gallon",
             "expiration_date": "2026-05-20",
@@ -123,7 +116,6 @@ async def test_create_food_item_unauthorized(client: AsyncClient):
             "brand": "Horizon Organic",
             "barcode": "742365008412",
             "category": "Dairy",
-            "image_url": "https://images.example.com/products/horizon-whole-milk.jpg",
             "quantity": 1.00,
             "unit": "gallon",
             "expiration_date": "2026-05-20",
@@ -148,7 +140,6 @@ async def test_read_food_item_success(client: AsyncClient):
             "brand": "Horizon Organic",
             "barcode": "742365008412",
             "category": "Dairy",
-            "image_url": "https://images.example.com/products/horizon-whole-milk.jpg",
             "quantity": 1.00,
             "unit": "gallon",
             "expiration_date": "2026-05-20",
@@ -198,7 +189,6 @@ async def test_read_food_items_success(client: AsyncClient):
                 "brand": random_string(),
                 "barcode": random_upc(),
                 "category": random_string(),
-                "image_url": f"https://image-of-food.com/products/{i}/front.jpg",
                 "quantity": 1.0 + i,
                 "unit": random_units(),
                 "expiration_date": f"2026-04-{i + 1:02d}",
@@ -226,7 +216,6 @@ async def test_update_food_item_success(client: AsyncClient):
             "brand": "Dave's Killer Bread",
             "barcode": "013764101628",
             "category": "Bakery",
-            "image_url": "https://images.example.com/products/daves-sourdough.jpg",
             "quantity": 1.00,
             "unit": "Loaf",
             "expiration_date": "2026-05-30",
@@ -241,7 +230,6 @@ async def test_update_food_item_success(client: AsyncClient):
         "brand": "Dave's Killer Bread - Updated",
         "barcode": random_upc(),
         "category": "Bread",
-        "image_url": "https://images.example.com/products/daves-supreme-sourdough.jpg",
         "quantity": 2.00,
         "unit": "Loaves",
         "expiration_date": "2025-06-21",
@@ -257,7 +245,6 @@ async def test_update_food_item_success(client: AsyncClient):
     assert content["brand"] == updated_data["brand"]
     assert content["barcode"] == updated_data["barcode"]
     assert content["category"] == updated_data["category"]
-    assert content["image_url"] == updated_data["image_url"]
     assert Decimal(content["quantity"]) == Decimal(updated_data["quantity"])
     assert content["unit"] == updated_data["unit"]
     assert content["expiration_date"] == updated_data["expiration_date"]
