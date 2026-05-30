@@ -46,7 +46,6 @@ class FoodItem(Base):
     brand: Mapped[Optional[str]] = mapped_column(String(30))
     barcode: Mapped[Optional[str]] = mapped_column(String(100))
     category: Mapped[Optional[str]] = mapped_column(String(30))
-    image_url: Mapped[Optional[str]] = mapped_column(Text)
     quantity: Mapped[Decimal] = mapped_column(
         sqlalchemy.Numeric(6, 2), nullable=False, default=Decimal("1.00")
     )
