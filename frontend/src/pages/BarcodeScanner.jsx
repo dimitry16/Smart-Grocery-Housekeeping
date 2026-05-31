@@ -171,11 +171,13 @@ function BarcodeScanner() {
   }
 
   function handleRescan() {
-    processingRef.current = false;
+    processingRef.current = true;
+    lastBarcodeRef.current = null;
     setResult(null);
     setLookupError(null);
-    if (mode === "camera") setMode(""); // force useEffect re-run
+    if (mode === "camera") setMode("");
     setTimeout(() => setMode("camera"), 50);
+    setTimeout(() => { processingRef.current = false; }, 1500);
   }
 
   return (
