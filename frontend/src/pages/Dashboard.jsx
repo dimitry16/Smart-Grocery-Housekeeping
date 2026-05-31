@@ -36,6 +36,7 @@ function PantryTable({ items }) {
                     <tr>
                         <th className="px-3 py-2 md:px-4 md:py-3 text-left">Name</th>
                         <th className="px-3 py-2 md:px-4 md:py-3 text-left hidden md:table-cell">Brand</th>
+                        <th className="px-3 py-2 md:px-4 md:py-3 text-left hidden md:table-cell">Quantity</th>
                         <th className="px-3 py-2 md:px-4 md:py-3 text-left">Category</th>
                         <th className="px-3 py-2 md:px-4 md:py-3 text-left hidden md:table-cell">Barcode</th>
                         <th className="px-3 py-2 md:px-4 md:py-3 text-left">Expiration</th>
@@ -51,6 +52,7 @@ function PantryTable({ items }) {
                             <tr key={item.id} className={`hover:brightness-95 ${rowColor(item.expiration_date)}`}>
                                 <td className="px-3 py-2 md:px-4 md:py-3 font-medium">{item.name}</td>
                                 <td className="px-3 py-2 md:px-4 md:py-3 text-gray-500 hidden md:table-cell">{item.brand ?? "—"}</td>
+                                <td className="px-3 py-2 md:px-4 md:py-3 text-gray-500 hidden md:table-cell">{item.quantity ?? "—"}</td>
                                 <td className="px-3 py-2 md:px-4 md:py-3">{item.category ?? "—"}</td>
                                 <td className="px-3 py-2 md:px-4 md:py-3 hidden md:table-cell">{item.barcode ?? "—"}</td>
                                 <td className="px-3 py-2 md:px-4 md:py-3">

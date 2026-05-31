@@ -19,6 +19,7 @@ function EditModal({ item, onClose, onSave }) {
   const [form, setForm] = useState({
     name: item.name ?? "",
     brand: item.brand ?? "",
+    quantity: item.quantity ?? "",
     barcode: item.barcode ?? "",
     category: item.category ?? "",
     expiration_date: item.expiration_date ?? "",
@@ -41,6 +42,7 @@ function EditModal({ item, onClose, onSave }) {
     const payload = {
       name: form.name || undefined,
       brand: form.brand || null,
+      quantity: form.quantity || null,
       barcode: form.barcode || null,
       category: form.category || null,
       expiration_date: form.expiration_date || null,
@@ -85,6 +87,15 @@ function EditModal({ item, onClose, onSave }) {
             <input
               id="edit-brand" name="brand" type="text" maxLength={30}
               value={form.brand} onChange={handleChange}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-gray-700" htmlFor="edit-quantity">Quantity</label>
+            <input
+              id="edit-quantity" name="quantity" type="text" maxLength={30}
+              value={form.quantity} onChange={handleChange}
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
             />
           </div>
@@ -243,6 +254,7 @@ function AllItems() {
             <tr>
               <th className="px-3 py-2 md:px-4 md:py-3 text-left">Name</th>
               <th className="px-3 py-2 md:px-4 md:py-3 text-left hidden md:table-cell">Brand</th>
+              <th className="px-3 py-2 md:px-4 md:py-3 text-left hidden md:table-cell">Quantity</th>
               <th className="px-3 py-2 md:px-4 md:py-3 text-left hidden sm:table-cell">Category</th>
               <th className="px-3 py-2 md:px-4 md:py-3 text-left hidden md:table-cell">Barcode</th>
               <th className="px-3 py-2 md:px-4 md:py-3 text-left">Expiration</th>
@@ -259,6 +271,7 @@ function AllItems() {
                 <tr key={item.id} className={`hover:brightness-95 ${rowColor(item.expiration_date)}`}>
                   <td className="px-3 py-2 md:px-4 md:py-3 font-medium">{item.name}</td>
                   <td className="px-3 py-2 md:px-4 md:py-3 text-gray-500 hidden md:table-cell">{item.brand ?? "—"}</td>
+                  <td className="px-3 py-2 md:px-4 md:py-3 font-medium hidden md:table-cell">{item.quantity}</td>
                   <td className="px-3 py-2 md:px-4 md:py-3 hidden sm:table-cell">{item.category ?? "—"}</td>
                   <td className="px-3 py-2 md:px-4 md:py-3 hidden md:table-cell">{item.barcode ?? "—"}</td>
                   <td className="px-3 py-2 md:px-4 md:py-3"><ExpiryBadge dateStr={item.expiration_date} /></td>
