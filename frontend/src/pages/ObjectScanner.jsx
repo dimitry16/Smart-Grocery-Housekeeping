@@ -27,6 +27,7 @@ function ObjectScanner() {
 
   async function startCamera() {
     setCameraError(null);
+    setCameraActive(true);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "environment" },
@@ -35,7 +36,6 @@ function ObjectScanner() {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
-      setCameraActive(true);
     } catch (err) {
       setCameraError(
         err?.message?.includes("Permission")

@@ -92,9 +92,11 @@ function EditModal({ item, onClose, onSave }) {
           </div>
 
           <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-700" htmlFor="edit-quantity">Quantity</label>
+            <label className="text-sm font-medium text-gray-700" htmlFor="edit-quantity">
+              Quantity <span className="text-red-500">*</span>
+            </label>
             <input
-              id="edit-quantity" name="quantity" type="text" maxLength={30}
+              id="edit-quantity" name="quantity" type="text" required maxLength={30}
               value={form.quantity} onChange={handleChange}
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
             />

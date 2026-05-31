@@ -7,7 +7,7 @@
 // URL: https://ui.shadcn.com/colors
 // URL: https://tailwindcss.com/docs/grid-template-columns 
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button"
 import { Card, CardAction, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { RECIPES_URL, apiFetch } from "@/lib/api";
@@ -24,40 +24,22 @@ const mockRecipes = [
 
 function Recipes() {
     const [recipes, setRecipes] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
     const { token } = useAuth();
 
-    useEffect(() => {
-        async function fetchRecipes() {
-            try {
-                const data = await apiFetch(RECIPES_URL, token);
-                setRecipes(data.recipes || []);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
+    async function fetchRecipes() {
+        setLoading(true);
+        setError(null);
+        try {
+            const data = await apiFetch(RECIPES_URL, token);
+            setRecipes(data.recipes || []);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
         }
-
-        fetchRecipes();
-    }, [token]);
-
-    if (loading) {
-        return (
-            <div className="p-6 max-w-5xl mx-auto text-center text-gray-500">
-                Loading recipes...
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="p-6 max-w-5xl mx-auto text-center text-red-500">
-                Failed to load recipes: {error}
-            </div>
-        );
     }
 
     async function handleSaveRecipe(recipe) {
@@ -77,6 +59,25 @@ function Recipes() {
     return (
         <div className="p-6 max-w-5xl mx-auto space-y-6">
             <h1 className="text-center text-4xl font-semibold text-gray-900">Recipes</h1>
+            
+            <div className="flex justify-center">
+                <Button 
+                    onClick={fetchRecipes}
+                    disabled={loading}
+                    className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2"
+                >
+                    {loading ? "Generating Recipes..." : "Get Recipe Suggestions"}
+                </Button>
+            </div>
+
+            {error && (
+                <div className="text-center text-red-500">Failed to load recipes: {error}</div>
+            )}
+            
+            {!loading && !error && recipes.length === 0 && (
+                <p className="text-center text-gray-500 mt-8">Click the button above to generate recipes based on your expiring items. A maximum of 6 recipes will be generated per day.</p>
+            )}
+
             {/* Responsive grid layout */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {recipes.map((recipe, index) => (
