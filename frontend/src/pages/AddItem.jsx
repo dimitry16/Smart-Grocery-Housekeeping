@@ -27,7 +27,7 @@ function AddItem() {
   const [form, setForm] = useState({
     name: prefill.name ?? "",
     brand: prefill.brand ?? "",
-    quantity: prefill.quantity ?? "",
+    quantity: prefill.quantity ?? "1",
     barcode: prefill.barcode ?? "",
     category: prefill.category ?? "",
     expiration_date: "",
@@ -114,9 +114,11 @@ function AddItem() {
         </div>
 
         <div className="space-y-1">
-          <label className="text-sm font-medium text-gray-700" htmlFor="brand">Quantity</label>
+          <label className="text-sm font-medium text-gray-700" htmlFor="quantity">
+            Quantity <span className="text-red-500">*</span>
+          </label>
           <input
-            id="quantity" name="quantity" type="decimal" maxLength={30}
+            id="quantity" name="quantity" type="text" required maxLength={30}
             value={form.quantity} onChange={handleChange} placeholder="1.00"
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
           />

@@ -12,8 +12,5 @@ __pycache__/
 .venv/
 env/
 venv/
-Dockerfile
-nginx.conf
-C:\Users\dimit\OneDrive\Documents\School\OSU-Post-Bacc\Spring-2026\CS467\Smart-Grocery-Housekeeping\backend\Dockerfile
 # ruff
 .ruff_cache/
