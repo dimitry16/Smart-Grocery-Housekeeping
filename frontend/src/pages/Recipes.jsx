@@ -75,7 +75,7 @@ function Recipes() {
             )}
             
             {!loading && !error && recipes.length === 0 && (
-                <p className="text-center text-gray-500 mt-8">Click the button above to generate recipes based on your expiring items.</p>
+                <p className="text-center text-gray-500 mt-8">Click the button above to generate recipes based on your expiring items. A maximum of 6 recipes will be generated per day.</p>
             )}
 
             {/* Responsive grid layout */}
