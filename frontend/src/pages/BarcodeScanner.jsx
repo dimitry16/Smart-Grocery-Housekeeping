@@ -172,7 +172,6 @@ function BarcodeScanner() {
 
   function handleRescan() {
     processingRef.current = false;
-    lastBarcodeRef.current = null;
     setResult(null);
     setLookupError(null);
     if (mode === "camera") setMode(""); // force useEffect re-run
