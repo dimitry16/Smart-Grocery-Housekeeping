@@ -95,6 +95,7 @@ function BarcodeScanner() {
   const lastBarcodeRef = useRef(null);
   const scanSessionRef = useRef(0);
 
+  const [scanAttempt, setScanAttempt] =  useState(0);
   const [mode, setMode] = useState("camera"); // "camera" | "manual"
   const [scanning, setScanning] = useState(false);
   const [lookingUp, setLookingUp] = useState(false);
@@ -111,7 +112,7 @@ function BarcodeScanner() {
     setScanning(true);
 
     reader
-      .decodeFromVideoDevice(undefined, videoRef.current, (res, err) => {
+      .decodeFromVideoDevice(undefined, videoRef.current, (res) => {
         if (sessionId !== scanSessionRef.current) return;
         if (res && !processingRef.current) {
           const code = res.getText();
@@ -125,22 +126,22 @@ function BarcodeScanner() {
       .catch((err) => {
         setCameraError(
           err?.message?.includes("Permission")
-            ? "Camera permission denied. Please allow camera access or use manual input."
+            ? "Camera permission denied. Please allow camera access or use manual mode."
             : "Could not start camera. Try manual mode.",
         );
         setScanning(false);
         setMode("manual");
       });
     return () => stopCamera();
-  }, [mode]);
+  }, [mode, scanAttempt]);
 
   function handleRescan() {
-    scanSessionRef.current += 1;
     processingRef.current = false;
+    lastBarcodeRef.current = null;
     setResult(null);
     setLookupError(null);
     stopCamera();
-    setMode("camera");
+    setScanAttempt((n) => n + 1);
   }
 
   function stopCamera() {
