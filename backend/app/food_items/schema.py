@@ -18,7 +18,7 @@ class LogUsageRequest(BaseModel):
 class FoodItemBase(BaseModel):
     """Food Item Base properties to be shared"""
 
-    name: str = Field(..., min_length=4, max_length=50)
+    name: str = Field(..., min_length=4, max_length=255)
     brand: str | None = Field(None, max_length=30)
     barcode: str | None = Field(None, max_length=100)
     category: str | None = Field(None, max_length=30)
@@ -32,7 +32,7 @@ class FoodItemCreate(FoodItemBase):
 
 
 class FoodItemUpdate(BaseModel):
-    name: str | None = Field(None, min_length=4, max_length=50)
+    name: str | None = Field(None, min_length=4, max_length=255)
     brand: str | None = Field(None, max_length=30)
     barcode: str | None = Field(None, max_length=100)
     category: str | None = Field(None, max_length=30)

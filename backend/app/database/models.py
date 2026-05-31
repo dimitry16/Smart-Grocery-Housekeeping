@@ -42,7 +42,7 @@ class FoodItem(Base):
     user_id: Mapped[UUID] = mapped_column(
         types.Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
-    name: Mapped[str] = mapped_column(String(50), nullable=False)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
     brand: Mapped[Optional[str]] = mapped_column(String(30))
     barcode: Mapped[Optional[str]] = mapped_column(String(100))
     category: Mapped[Optional[str]] = mapped_column(String(30))
@@ -69,7 +69,7 @@ class UsageLog(Base):
     user_id: Mapped[UUID] = mapped_column(
         types.Uuid, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
-    food_item_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    food_item_name: Mapped[str] = mapped_column(String(255), nullable=False)
     category: Mapped[Optional[str]] = mapped_column(String(30))
     action: Mapped[str] = mapped_column(String(10), nullable=False)
     logged_at: Mapped[datetime.datetime] = mapped_column(
