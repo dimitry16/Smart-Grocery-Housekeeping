@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
         if self.ENVIRONMENT != "local":
-            return None
+            return self.DATABASE_URL
 
         # Validate that local vars are actually present before building
         if not all([self.POSTGRES_SERVER, self.POSTGRES_DB, self.POSTGRES_USER]):
