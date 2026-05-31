@@ -27,7 +27,7 @@ app = FastAPI(lifespan=lifespan)
 # CORS Middleware edited by Zilin Xu
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Vite's default port
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
