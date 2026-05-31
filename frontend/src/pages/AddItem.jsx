@@ -27,6 +27,7 @@ function AddItem() {
   const [form, setForm] = useState({
     name: prefill.name ?? "",
     brand: prefill.brand ?? "",
+    quantity: prefill.quantity ?? "",
     barcode: prefill.barcode ?? "",
     category: prefill.category ?? "",
     expiration_date: "",
@@ -47,6 +48,7 @@ function AddItem() {
     const payload = {
       name: form.name,
       brand: form.brand || null,
+      quantity: form.quantity || null,
       barcode: form.barcode || null,
       category: form.category || null,
       expiration_date: form.expiration_date || null,
@@ -107,6 +109,15 @@ function AddItem() {
           <input
             id="brand" name="brand" type="text" maxLength={30}
             value={form.brand} onChange={handleChange} placeholder="e.g. Horizon Organic"
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-gray-700" htmlFor="brand">Quantity</label>
+          <input
+            id="quantity" name="quantity" type="decimal" maxLength={30}
+            value={form.quantity} onChange={handleChange} placeholder="1.00"
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
           />
         </div>
