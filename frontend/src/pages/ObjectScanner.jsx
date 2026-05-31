@@ -3,6 +3,11 @@
 // Name: Zilin Xu
 // Date: 5/23/2026
 
+// Fix object scanner bug where the video feed stays black
+// Name: Krystal Lu
+// Date: 5/30/26
+
+
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -13,16 +18,22 @@ function ObjectScanner() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
+  const abortRef = useRef(null);
 
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraError, setCameraError] = useState(null);
+  const [capturedSrc, setCapturedSrc] = useState(null);
   const [detecting, setDetecting] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     startCamera();
-    return () => stopCamera();
+    return () => {
+      stopCamera();
+      // Abort request if user navigates away from object scan
+      abortRef.current?.abort();
+    };
   }, []);
 
   async function startCamera() {
@@ -32,11 +43,20 @@ function ObjectScanner() {
         video: { facingMode: "environment" },
       });
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
+
+      const video = videoRef.current;
+      if (!video) {
+        // if the video element hasn't been set, then stop stream
+        stream.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+        return;
       }
+
+      video.srcObject = stream;
+
       setCameraActive(true);
     } catch (err) {
+      if (err?.name === "AbortError") return;
       setCameraError(
         err?.message?.includes("Permission")
           ? "Camera permission denied. Please allow camera access to scan objects."
@@ -47,21 +67,30 @@ function ObjectScanner() {
   }
 
   function stopCamera() {
+    // Stop camera feed and reset connections and update state
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
     }
     setCameraActive(false);
   }
 
   async function handleCapture() {
-    if (!videoRef.current || !canvasRef.current) return;
-
     const video = videoRef.current;
     const canvas = canvasRef.current;
+    if (!video|| !canvas) return;
+
+    
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     canvas.getContext("2d").drawImage(video, 0, 0);
+
+    // Store preview before stopping the camera and 
+    // changing the detect state
+    setCapturedSrc(canvas.toDataURL("image/jpeg", 0.85));
 
     stopCamera();
     setDetecting(true);
@@ -76,9 +105,14 @@ function ObjectScanner() {
       const formData = new FormData();
       formData.append("image", blob, "capture.jpg");
 
+      // Set AbortController so we can cancel the fetch if the user navigates away
+      const controller = new AbortController();
+      abortRef.current = controller;
+
       const response = await fetch(VISION_DETECT_URL, {
         method: "POST",
         body: formData,
+        signal: controller.signal,
       });
 
       if (!response.ok) {
@@ -93,6 +127,7 @@ function ObjectScanner() {
         setError("No fruit or vegetable detected. Try again with a clearer image.");
       }
     } catch (err) {
+      if (err.name === "AbortError") return;
       setError(
         err.message.includes("fetch")
           ? "Could not reach the server. The image recognition API may not be running yet."
@@ -100,6 +135,7 @@ function ObjectScanner() {
       );
     } finally {
       setDetecting(false);
+      abortRef.current = null;
     }
   }
 
@@ -110,11 +146,16 @@ function ObjectScanner() {
   function handleScanAgain() {
     setResult(null);
     setError(null);
+    setCapturedSrc(null);
     startCamera();
   }
 
+  const showLiveCameraFeed = cameraActive && !detecting && !result;
+
   return (
     <div className="p-6 max-w-lg mx-auto space-y-6">
+
+      {/* header */}
       <div className="flex items-center gap-3">
         <button
           onClick={() => navigate(-1)}
@@ -129,31 +170,57 @@ function ObjectScanner() {
         Point your camera at a fruit or vegetable and tap Capture to identify it.
       </p>
 
-      {/* Camera view */}
-      {cameraActive && !result && (
-        <div className="space-y-3">
-          <div className="relative rounded-lg overflow-hidden border border-gray-300 bg-black aspect-video">
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="w-48 h-48 border-2 border-emerald-400 rounded-full opacity-70" />
-            </div>
+      {/* Camera View (Always rendered so videoRef is always valid) */}
+      <div className={`relative rounded-lg overflow-hidden border border-gray-300 bg-black aspect-video ${
+        showLiveCameraFeed || detecting ? "" : "hidden"
+      }`}>
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className={`w-full h-full object-cover ${
+            showLiveCameraFeed ? "" : "hidden"
+          }`}
+        />
+
+        {showLiveCameraFeed && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="w-48 h-48 border-2 border-emerald-400 rounded-full opacity-70" />
           </div>
-          <div className="flex justify-center">
-            <Button
-              onClick={handleCapture}
-              className="bg-emerald-500 hover:bg-emerald-600 text-white px-8"
-            >
-              Capture
-            </Button>
-          </div>
+        )}
+
+        {detecting && capturedSrc && (
+          <img
+            src={capturedSrc}
+            alt="Captured frame"
+            className="w-full h-full object-cover"
+          />
+        )}
+      </div>
+
+      {/* Capture Button */}
+      {showLiveCameraFeed && (
+        <div className="flex justify-center">
+          <Button 
+          onClick={handleCapture} 
+          className="bg-emerald-500 hover:bg-emerald-600 text-white px-8"
+          >
+            Capture
+          </Button>
         </div>
       )}
+
+      {/* Detecting spinner */}
+      {detecting && (
+        <p className="text-center text-sm text-gray-500 animate-pulse">
+          Detecting...
+        </p>
+      )}
+
+      {/* hidden canvas that is always mounted */}
+      {<canvas ref={canvasRef} className="hidden" />}
+
 
       {/* Camera error */}
       {cameraError && (
@@ -162,18 +229,7 @@ function ObjectScanner() {
         </div>
       )}
 
-      {/* Detecting spinner */}
-      {detecting && (
-        <div className="text-center space-y-3">
-          <canvas ref={canvasRef} className="mx-auto rounded-lg border border-gray-200 max-w-full" />
-          <p className="text-sm text-gray-500 animate-pulse">Detecting...</p>
-        </div>
-      )}
-
-      {/* Hidden canvas for non-detecting state */}
-      {!detecting && <canvas ref={canvasRef} className="hidden" />}
-
-      {/* Error message */}
+      {/* Detection error message */}
       {error && (
         <div className="space-y-3">
           <div className="rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-600">
