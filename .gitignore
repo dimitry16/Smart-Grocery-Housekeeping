@@ -12,8 +12,6 @@ backend/tests/test_google_vision.py
 frontend/node_modules/
 frontend/dist/
 frontend/.env
-frontend/src/lib/pages/Dockerfile
-frontend/src/lib/pages/nginx.conf
 
 # General
 .DS_Store
