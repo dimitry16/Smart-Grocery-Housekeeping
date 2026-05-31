@@ -58,7 +58,9 @@ function ManualInput({ onSubmit, loading }) {
 
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium text-gray-700">Enter barcode manually</label>
+      <label className="text-sm font-medium text-gray-700">
+        Enter barcode manually
+      </label>
       <div className="flex gap-2">
         <input
           type="text"
@@ -90,7 +92,10 @@ function BarcodeScanner() {
   const videoRef = useRef(null);
   const readerRef = useRef(null);
   const processingRef = useRef(false);
+  const lastBarcodeRef = useRef(null);
+  const scanSessionRef = useRef(0);
 
+  const [scanAttempt, setScanAttempt] =  useState(0);
   const [mode, setMode] = useState("camera"); // "camera" | "manual"
   const [scanning, setScanning] = useState(false);
   const [lookingUp, setLookingUp] = useState(false);
@@ -98,39 +103,46 @@ function BarcodeScanner() {
   const [lookupError, setLookupError] = useState(null);
   const [result, setResult] = useState(null); // found product
 
-  // Start camera scanning
   useEffect(() => {
     if (mode !== "camera") return;
 
+    const sessionId = ++scanSessionRef.current;
     const reader = new BrowserMultiFormatReader();
     readerRef.current = reader;
     setScanning(true);
-    setCameraError(null);
 
     reader
-      .decodeFromVideoDevice(undefined, videoRef.current, (res, err) => {
+      .decodeFromVideoDevice(undefined, videoRef.current, (res) => {
+        if (sessionId !== scanSessionRef.current) return;
         if (res && !processingRef.current) {
+          const code = res.getText();
+          if (code === lastBarcodeRef.current) return;
           processingRef.current = true;
+          lastBarcodeRef.current = code;
           stopCamera();
-          handleBarcode(res.getText());
-        }
-        if (err && !(err instanceof NotFoundException)) {
-          // NotFoundException just means no barcode in frame yet — ignore
-          console.error("Scanner error:", err);
+          handleBarcode(code);
         }
       })
       .catch((err) => {
         setCameraError(
           err?.message?.includes("Permission")
-            ? "Camera permission denied. Please allow camera access or use manual input."
-            : "Could not start camera. Try manual input instead."
+            ? "Camera permission denied. Please allow camera access or use manual mode."
+            : "Could not start camera. Try manual mode.",
         );
         setScanning(false);
         setMode("manual");
       });
-
     return () => stopCamera();
-  }, [mode]);
+  }, [mode, scanAttempt]);
+
+  function handleRescan() {
+    processingRef.current = false;
+    lastBarcodeRef.current = null;
+    setResult(null);
+    setLookupError(null);
+    stopCamera();
+    setScanAttempt((n) => n + 1);
+  }
 
   function stopCamera() {
     if (videoRef.current?.srcObject) {
@@ -138,7 +150,9 @@ function BarcodeScanner() {
       videoRef.current.srcObject = null;
     }
     if (readerRef.current) {
-      try { readerRef.current.reset(); } catch (_) {}
+      try {
+        readerRef.current.reset();
+      } catch (_) {}
     }
     setScanning(false);
   }
@@ -155,7 +169,9 @@ function BarcodeScanner() {
         navigate("/additem", { state: { barcode } });
       }
     } catch {
-      setLookupError("Could not reach Open Food Facts. You can still add the item manually.");
+      setLookupError(
+        "Could not reach Open Food Facts. You can still add the item manually.",
+      );
       setResult(null);
     } finally {
       setLookingUp(false);
@@ -164,14 +180,6 @@ function BarcodeScanner() {
 
   function handleUseResult() {
     navigate("/additem", { state: result });
-  }
-
-  function handleRescan() {
-    processingRef.current = false;
-    setResult(null);
-    setLookupError(null);
-    if (mode === "camera") setMode(""); // force useEffect re-run
-    setTimeout(() => setMode("camera"), 50);
   }
 
   return (
@@ -189,7 +197,11 @@ function BarcodeScanner() {
       {/* Mode toggle */}
       <div className="flex gap-2">
         <button
-          onClick={() => { setResult(null); setLookupError(null); setMode("camera"); }}
+          onClick={() => {
+            setResult(null);
+            setLookupError(null);
+            setMode("camera");
+          }}
           className={`px-4 py-2 rounded-md text-sm font-medium border transition-colors ${
             mode === "camera"
               ? "bg-emerald-500 text-white border-emerald-500"
@@ -199,7 +211,12 @@ function BarcodeScanner() {
           📷 Camera
         </button>
         <button
-          onClick={() => { stopCamera(); setResult(null); setLookupError(null); setMode("manual"); }}
+          onClick={() => {
+            stopCamera();
+            setResult(null);
+            setLookupError(null);
+            setMode("manual");
+          }}
           className={`px-4 py-2 rounded-md text-sm font-medium border transition-colors ${
             mode === "manual"
               ? "bg-emerald-500 text-white border-emerald-500"
@@ -227,7 +244,9 @@ function BarcodeScanner() {
               </div>
             )}
           </div>
-          <p className="text-sm text-gray-500 text-center">Point your camera at a barcode</p>
+          <p className="text-sm text-gray-500 text-center">
+            Point your camera at a barcode
+          </p>
 
           {cameraError && (
             <div className="rounded-md border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-700">
@@ -244,7 +263,9 @@ function BarcodeScanner() {
 
       {/* Looking up spinner */}
       {lookingUp && (
-        <p className="text-sm text-gray-500 text-center animate-pulse">Looking up barcode...</p>
+        <p className="text-sm text-gray-500 text-center animate-pulse">
+          Looking up barcode...
+        </p>
       )}
 
       {/* Lookup error */}
