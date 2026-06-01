@@ -11,13 +11,13 @@ A full-stack web application that helps users track their grocery inventory and 
 - **Saved Recipes** — Bookmark recipes for later reference
 - **Usage Reports** — Track consumption patterns and food waste analytics
 - **Expiration Alerts** — Color-coded badges indicating expired, expiring soon, or safe items
-- **PWA Support** — Installable as a progressive web app for offline access
+- **PWA Support** — Installable as a progressive web app to use as a native mobile app
 
 ## Tech Stack
 
 | Layer | Technologies |
 |-------|-------------|
-| Frontend | React 19, Vite, Tailwind CSS, shadcn/ui, React Router |
+| Frontend | React 19, Vite, React Router 7, Tailwind CSS, shadcn/ui |
 | Backend | Python, FastAPI, SQLAlchemy (async), Alembic |
 | Database | PostgreSQL (local or Google Cloud SQL) |
 | Auth | JWT with Argon2 password hashing |
@@ -89,7 +89,11 @@ alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
-The API will be available at `http://localhost:8000`. Interactive docs at `http://localhost:8000/docs`.
+The API will be available at `http://localhost:8000`. 
+
+Access the Interactive API documentation at:
+- ReDocs: `http://localhost:8000/redoc`
+- Swagger UI: `http://localhost:8000/docs`
 
 ### Frontend Setup
 
