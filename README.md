@@ -80,6 +80,7 @@ cp .env.example .env
 # Edit .env with your database credentials and API keys:
 #   POSTGRES_SERVER, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD
 #   SECRET_KEY (generate with: openssl rand -hex 32)
+#   TEST_DATABASE_URL (Create another database, locally, for testing API endpoints)
 #   SPOONACULAR_API_KEY (optional, for recipe suggestions)
 
 # Run database migrations
@@ -101,7 +102,7 @@ Access the Interactive API documentation at:
 cd frontend
 
 # Install dependencies
-npm install
+npm ci
 
 # Start development server
 npm run dev
@@ -143,6 +144,7 @@ docker run -p 80:80 grocery-frontend
 | `POSTGRES_USER` | Yes | Database user |
 | `POSTGRES_PASSWORD` | Yes | Database password |
 | `SECRET_KEY` | Yes | JWT signing key |
+| `TEST_DATABASE_URL` | Yes | Test database connection URL used to isolate test data during API endpoint testing. |
 | `SPOONACULAR_API_KEY` | No | Spoonacular API key for recipes |
 | `GOOGLE_APPLICATION_CREDENTIALS` | No | Path to GCP service account JSON for Vision API |
 
@@ -150,7 +152,7 @@ docker run -p 80:80 grocery-frontend
 
 ```bash
 cd backend
-pytest --cov=app tests/
+pytest tests/
 ```
 
 ## License
